@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Blaze CS2 — Admin Panel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--orange:#FF6B00;--bg:#0B0F17;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.07)}
+body{background:var(--bg);color:#fff;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--orange);border-radius:4px}
+#sidebar{width:220px;min-height:100vh;background:rgba(11,15,23,0.98);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex-shrink:0}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{height:60px;background:rgba(11,15,23,0.95);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;z-index:50}
+#content{flex:1;padding:24px;overflow-y:auto}
+.logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10}
+.logo-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#FF6B00,#ff3300);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 20px rgba(255,107,0,0.5)}
+.logo-text{font-size:16px;font-weight:800;color:var(--orange)}
+nav{flex:1;padding:10px 8px;overflow-y:auto}
+.nav-btn{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:3px;background:transparent;border:1px solid transparent;color:#888;text-align:left;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.nav-btn:hover{background:rgba(255,255,255,0.04);color:#ccc}
+.nav-btn.active{background:linear-gradient(135deg,rgba(255,107,0,0.2),rgba(255,107,0,0.05));border-color:rgba(255,107,0,0.35);color:var(--orange);font-weight:700}
+.nav-badge{margin-left:auto;background:var(--orange);color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;flex:1}
+.btn-primary{background:linear-gradient(135deg,#FF6B00,#FF8C00);border:none;border-radius:10px;padding:9px 18px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;box-shadow:0 4px 15px rgba(255,107,0,0.3)}
+.btn-primary:hover{box-shadow:0 6px 25px rgba(255,107,0,0.5)}
+.btn-ghost{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 14px;color:#ccc;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-sm{width:30px;height:30px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.btn-blue{background:rgba(52,152,219,0.15);border:1px solid rgba(52,152,219,0.3)}
+.btn-orange{background:rgba(255,107,0,0.15);border:1px solid rgba(255,107,0,0.3)}
+.btn-red{background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3)}
+.btn-green{background:rgba(0,208,132,0.15);border:1px solid rgba(0,208,132,0.3)}
+.inp{padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s;width:100%}
+.inp:focus{border-color:rgba(255,107,0,0.4)}
+select.inp option{background:#1a1f2e;color:#fff}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{padding:9px 12px;text-align:left;color:#666;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid rgba(255,255,255,0.06)}
+.tbl td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.tbl tr:hover td{background:rgba(255,107,0,0.03)}
+.tbl tr.selected td{background:rgba(255,107,0,0.07)}
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;display:inline-block}
+.badge-pending{color:#FF6B00;background:rgba(255,107,0,0.15);border:1px solid rgba(255,107,0,0.3)}
+.badge-confirmed,.badge-delivered,.badge-active{color:#00d084;background:rgba(0,208,132,0.15);border:1px solid rgba(0,208,132,0.3)}
+.badge-rejected,.badge-cancelled,.badge-banned{color:#e74c3c;background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3)}
+.badge-ended,.badge-hidden{color:#888;background:rgba(136,136,136,0.15);border:1px solid rgba(136,136,136,0.3)}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;position:sticky;top:24px;width:320px;flex-shrink:0;height:fit-content}
+.row{display:flex;gap:16px}
+.page{animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tabs{display:flex;gap:4px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap}
+.tab{background:none;border:1px solid transparent;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#666;cursor:pointer;transition:all .15s}
+.tab.active{background:rgba(255,107,0,0.2);border-color:rgba(255,107,0,0.4);color:var(--orange)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#131820;border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto}
+.toggle{width:44px;height:24px;border-radius:12px;cursor:pointer;position:relative;border:none;transition:background .2s;flex-shrink:0}
+.toggle.on{background:linear-gradient(135deg,#FF6B00,#FF8C00)}
+.toggle.off{background:rgba(255,255,255,0.1)}
+.toggle::after{content:'';position:absolute;top:2px;width:18px;height:18px;border-radius:50%;background:white;transition:left .2s}
+.toggle.on::after{left:22px}.toggle.off::after{left:2px}
+.stat-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+#toast{position:fixed;top:20px;right:20px;z-index:1000;display:none}
+.toast-inner{background:rgba(20,25,35,0.97);border-radius:12px;padding:14px 18px;font-size:14px;font-weight:600;color:#fff;border-left:4px solid var(--orange);box-shadow:0 8px 30px rgba(0,0,0,0.5)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="position:fixed;inset:0;background:#0B0F17;display:flex;align-items:center;justify-content:center;z-index:500;flex-direction:column;gap:20px">
+  <div style="font-size:60px">🔥</div>
+  <div style="font-size:26px;font-weight:900;color:#FF6B00">Blaze CS2</div>
+  <div style="font-size:14px;color:#888;margin-bottom:10px">Admin Panel</div>
+  <input id="pw-input" type="password" class="inp" placeholder="Parol kiriting" style="width:280px;text-align:center;font-size:16px"
+    onkeydown="if(event.key==='Enter')checkLogin()"/>
+  <button class="btn-primary" onclick="checkLogin()" style="width:280px;justify-content:center;padding:13px">Kirish</button>
+  <div id="pw-err" style="color:#e74c3c;font-size:13px;display:none">Noto'g'ri parol!</div>
+</div>
+
+<div id="app" style="display:none;width:100%">
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🔥</div>
+    <div><div class="logo-text">BLAZE</div><div style="font-size:9px;color:#888;letter-spacing:.12em">CS2 ADMIN</div></div>
+  </div>
+  <nav id="sidenav">
+    <button class="nav-btn active" onclick="goPage('dashboard')">📊 <span>Dashboard</span></button>
+    <button class="nav-btn" onclick="goPage('shop')">🛒 <span>Shop</span></button>
+    <button class="nav-btn" onclick="goPage('orders')">📦 <span>Buyurtmalar</span> <span class="nav-badge" id="orders-badge">0</span></button>
+    <button class="nav-btn" onclick="goPage('deposits')">💳 <span>To'lovlar</span> <span class="nav-badge" id="dep-badge">0</span></button>
+    <button class="nav-btn" onclick="goPage('giveaways')">🎁 <span>Giveawaylar</span></button>
+    <button class="nav-btn" onclick="goPage('users')">👥 <span>Foydalanuvchilar</span></button>
+    <button class="nav-btn" onclick="goPage('settings')">⚙️ <span>Sozlamalar</span></button>
+  </nav>
+  <div style="padding:12px 8px;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:12px">
+      <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B00,#ff3300);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900">B</div>
+      <div><div style="font-size:12px;font-weight:700">Blaze Admin</div><div style="font-size:10px;color:#888">Administrator</div></div>
+    </div>
+    <button class="btn-ghost" style="width:100%;justify-content:center;margin-top:8px;color:#e74c3c;border-color:rgba(231,76,60,0.2)" onclick="logout()">🚪 Chiqish</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div id="breadcrumb" style="font-size:13px;color:#666;flex:1">Dashboard</div>
+    <input class="inp" placeholder="Qidirish..." style="width:200px" id="global-search"/>
+    <div style="position:relative">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer">🔔</div>
+      <div id="notif-dot" style="position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:#FF6B00;border:2px solid #0B0F17;display:none"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:9px;padding:6px 12px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--border)">
+      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#FF6B00,#ff3300);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900">B</div>
+      <div style="font-size:12px;font-weight:700">Blaze Admin</div>
+    </div>
+  </div>
+  <div id="content"></div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"><div class="toast-inner" id="toast-msg"></div></div>
+
+<script>
+const API = 'http://localhost:8080/api'
+const ADMIN_TID = 123456789
+let currentPage = 'dashboard'
+
+// Mock data
+const SKINS=[
+  {id:124,name:'AK-47 | Redline',weapon_type:'Rifle',exterior:'Field-Tested',float_val:0.16,pattern:782,price:65000,status:'active',stock:3,is_featured:1,collection:'The Phoenix Collection'},
+  {id:123,name:'AWP | Hyper Beast',weapon_type:'Sniper Rifle',exterior:'Minimal Wear',float_val:0.12,pattern:341,price:120000,status:'active',stock:2,is_featured:1,collection:'The Wildfire Collection'},
+  {id:122,name:'M4A1-S | Night Terror',weapon_type:'Rifle',exterior:'Field-Tested',float_val:0.21,pattern:182,price:75000,status:'active',stock:5,is_featured:0,collection:'The Dreams & Nightmares'},
+  {id:121,name:'Desert Eagle | Printstream',weapon_type:'Pistol',exterior:'Factory New',float_val:0.03,pattern:654,price:85000,status:'active',stock:4,is_featured:1,collection:'The Fracture Collection'},
+  {id:120,name:'★ Karambit | Lore',weapon_type:'Knife',exterior:'Factory New',float_val:0.01,pattern:921,price:2850000,status:'active',stock:1,is_featured:1,collection:'The Breakout Collection'},
+  {id:119,name:'Glock-18 | Neo-Noir',weapon_type:'Pistol',exterior:'Field-Tested',float_val:0.23,pattern:443,price:25000,status:'hidden',stock:8,is_featured:0,collection:'The Gamma 2 Collection'},
+]
+const ORDERS=[
+  {id:1024,user:'@notcoin11',first_name:'Botirali',telegram_id:12564875,skin_name:'AK-47 | Redline',exterior:'FT',price:65000,status:'pending',created_at:'2024-05-19 14:32',payment:'Balance'},
+  {id:1023,user:'@sardoruz',first_name:'Sardor',telegram_id:12564876,skin_name:'AWP | Hyper Beast',exterior:'MW',price:120000,status:'delivered',created_at:'2024-05-19 14:20',payment:'Balance'},
+  {id:1022,user:'@asilbek',first_name:'Asilbek',telegram_id:12564877,skin_name:'M4A1-S | Night Terror',exterior:'FT',price:75000,status:'pending',created_at:'2024-05-19 13:55',payment:'Balance'},
+  {id:1021,user:'@jaxongir',first_name:'Jaxongir',telegram_id:12564878,skin_name:'Desert Eagle',exterior:'FT',price:85000,status:'delivered',created_at:'2024-05-19 13:22',payment:'Payment'},
+  {id:1020,user:'@umarovv',first_name:'Umar',telegram_id:12564879,skin_name:'★ Karambit | Lore',exterior:'FN',price:2850000,status:'delivered',created_at:'2024-05-19 12:45',payment:'Balance'},
+  {id:1019,user:'@mirxx',first_name:'Mirx',telegram_id:12564880,skin_name:'Glock-18 | Neo-Noir',exterior:'FT',price:25000,status:'cancelled',created_at:'2024-05-19 11:38',payment:'Balance'},
+]
+const DEPOSITS=[
+  {id:1542,user:'@notcoin11',first_name:'Botirali',telegram_id:12564875,amount:100000,method:'UZCARD',transaction_id:'8600 4904 **** 1234',status:'pending',created_at:'2024-05-19 14:32'},
+  {id:1541,user:'@sardoruz',first_name:'Sardor',telegram_id:12564876,amount:50000,method:'HUMO',transaction_id:'9860 1201 **** 5678',status:'confirmed',created_at:'2024-05-19 14:20'},
+  {id:1540,user:'@asilbek',first_name:'Asilbek',telegram_id:12564877,amount:200000,method:'CLICK',transaction_id:'click_123456789',status:'confirmed',created_at:'2024-05-19 13:55'},
+  {id:1539,user:'@jaxongir',first_name:'Jaxongir',telegram_id:12564878,amount:150000,method:'PAYME',transaction_id:'payme_987654321',status:'pending',created_at:'2024-05-19 13:22'},
+]
+const USERS=[
+  {id:328,username:'@notcoin11',first_name:'Botirali',telegram_id:12564875,balance:250000,status:'active',created_at:'2024-05-15 14:32',orders:12,is_banned:0},
+  {id:327,username:'@sardoruz',first_name:'Sardor',telegram_id:12564876,balance:150000,status:'active',created_at:'2024-05-15 13:58',orders:7,is_banned:0},
+  {id:326,username:'@asilbek',first_name:'Asilbek',telegram_id:12564877,balance:320000,status:'active',created_at:'2024-05-15 13:20',orders:15,is_banned:0},
+  {id:324,username:'@umarovv',first_name:'Umar',telegram_id:12564879,balance:75000,status:'active',created_at:'2024-05-15 12:10',orders:5,is_banned:0},
+  {id:320,username:'@abdulla_17',first_name:'Abdulla',telegram_id:12564883,balance:180000,status:'banned',created_at:'2024-05-15 10:40',orders:2,is_banned:1},
+]
+const GIVEAWAYS=[
+  {id:1,title:'Weekly AK-47 Giveaway',prize_name:'AK-47 | Redline (FT)',participant_count:156,max_participants:200,status:'active',end_time:'2024-05-21 18:00'},
+  {id:2,title:'AWP Hyper Beast Special',prize_name:'AWP | Hyper Beast (MW)',participant_count:98,max_participants:150,status:'active',end_time:'2024-05-20 18:00'},
+  {id:3,title:'Karambit Mega Giveaway',prize_name:'★ Karambit | Lore (FN)',participant_count:312,max_participants:500,status:'active',end_time:'2024-05-24 18:00'},
+]
+
+let selectedItem = null
+
+// ── Auth ──────────────────────────────────────────────────────────
+function checkLogin() {
+  const pw = document.getElementById('pw-input').value
+  if (pw === 'blaze2024') {
+    document.getElementById('login-screen').style.display = 'none'
+    document.getElementById('app').style.display = 'flex'
+    goPage('dashboard')
+    updateBadges()
+  } else {
+    document.getElementById('pw-err').style.display = 'block'
+    haptic()
+  }
+}
+function logout() {
+  document.getElementById('login-screen').style.display = 'flex'
+  document.getElementById('app').style.display = 'none'
+  document.getElementById('pw-input').value = ''
+}
+document.getElementById('pw-input')?.addEventListener('keydown', e => e.key === 'Enter' && checkLogin())
+
+function haptic() {}
+function toast(msg, type='success') {
+  const colors = {success:'#00d084',error:'#e74c3c',info:'#3498db',warning:'#f39c12'}
+  const t = document.getElementById('toast')
+  const m = document.getElementById('toast-msg')
+  m.textContent = msg
+  t.querySelector('.toast-inner').style.borderLeftColor = colors[type]||colors.info
+  t.style.display = 'block'
+  setTimeout(() => t.style.display='none', 3000)
+}
+function updateBadges() {
+  const pOrders = ORDERS.filter(o=>o.status==='pending').length
+  const pDeps = DEPOSITS.filter(d=>d.status==='pending').length
+  document.getElementById('orders-badge').textContent = pOrders
+  document.getElementById('dep-badge').textContent = pDeps
+  if (pOrders+pDeps > 0) document.getElementById('notif-dot').style.display='block'
+}
+
+// ── Navigation ────────────────────────────────────────────────────
+function goPage(page) {
+  currentPage = page; selectedItem = null
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    const label = b.querySelector('span')?.textContent?.toLowerCase()
+    b.classList.toggle('active',
+      b.textContent.toLowerCase().includes(page) ||
+      (page==='dashboard' && b.textContent.includes('Dashboard')))
+  })
+  const names = {dashboard:'Dashboard',shop:'Shop Management',orders:'Buyurtmalar',
+    deposits:"To'lovlar",giveaways:'Giveawaylar',users:'Foydalanuvchilar',settings:'Sozlamalar'}
+  document.getElementById('breadcrumb').innerHTML =
+    `<span style="cursor:pointer;color:#666" onclick="goPage('dashboard')">Dashboard</span>` +
+    (page!=='dashboard' ? ` <span style="color:#444">›</span> <span style="color:#ccc">${names[page]||page}</span>` : '')
+  const pages = {dashboard:renderDashboard,shop:renderShop,orders:renderOrders,
+    deposits:renderDeposits,giveaways:renderGiveaways,users:renderUsers,settings:renderSettings}
+  document.getElementById('content').innerHTML = `<div class="page">${(pages[page]||renderDashboard)()}</div>`
+}
+
+function badge(s) {
+  const labels = {pending:'Kutilmoqda',confirmed:'Tasdiqlandi',delivered:'Yetkazildi',
+    rejected:'Rad etildi',cancelled:'Bekor',active:'Faol',ended:'Tugadi',hidden:'Yashirin',banned:'Bloklangan'}
+  return `<span class="badge badge-${s}">${labels[s]||s}</span>`
+}
+function num(n) { return (n||0).toLocaleString() }
+function pager(total) {
+  return `<div style="display:flex;gap:5px;align-items:center">
+    ${[1,2,3,'...',Math.max(1,Math.ceil(total/10))].map((p,i)=>`<button style="width:30px;height:30px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.08);background:${i===0?'linear-gradient(135deg,#FF6B00,#ff8c00)':'rgba(255,255,255,0.05)'};color:${i===0?'#fff':'#888'};cursor:pointer">${p}</button>`).join('')}
+  </div>`
+}
+function chartBar(vals, labels, color='#FF6B00') {
+  const max = Math.max(...vals)||1
+  return `<div style="display:flex;align-items:flex-end;gap:8px;height:100px">
+    ${vals.map((v,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:100%;background:${color};border-radius:4px 4px 0 0;height:${Math.round((v/max)*80)}px;min-height:3px;opacity:.85;transition:height .4s"></div>
+      <div style="font-size:9px;color:#666">${labels[i]}</div>
+    </div>`).join('')}
+  </div>`
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────
+function renderDashboard() {
+  const pOrders = ORDERS.filter(o=>o.status==='pending').length
+  const pDeps = DEPOSITS.filter(d=>d.status==='pending').length
+  const todayRev = ORDERS.filter(o=>o.status!=='cancelled').reduce((a,o)=>a+o.price,0)
+  return `
+    <div style="margin-bottom:24px"><h1 style="font-size:24px;font-weight:800">Dashboard</h1><p style="color:#666;font-size:13px;margin-top:3px">Blaze CS2 Admin Panel</p></div>
+    <div class="stat-row">
+      ${[{l:'Foydalanuvchilar',v:'328',s:'+24 bugun',c:'#9b59b6',i:'👥'},
+         {l:'Jami Daromad',v:'12.45M so\'m',s:'+2.13M bugun',c:'#00d084',i:'💰'},
+         {l:'Bugungi Sotuv',v:'25',s:'+7 bugun',c:'#FF6B00',i:'🛒'},
+         {l:'Kutayotgan',v:pOrders,s:'buyurtma',c:'#e74c3c',i:'⏳'},
+         {l:"To'lovlar",v:pDeps,s:'tasdiqlanmagan',c:'#3498db',i:'💳'},
+       ].map(s=>`<div class="stat-card" style="border-color:${s.c}25">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:40px;height:40px;border-radius:11px;background:${s.c}18;border:1px solid ${s.c}35;display:flex;align-items:center;justify-content:center;font-size:18px">${s.i}</div>
+          <span style="font-size:11px;color:#888;font-weight:600">${s.l}</span>
+        </div>
+        <div style="font-size:22px;font-weight:800">${s.v}</div>
+        <div style="font-size:11px;color:${s.s.startsWith('+')?'#00d084':'#888'};margin-top:4px">${s.s}</div>
+      </div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="card" style="padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3 style="font-size:15px;font-weight:700">Haftalik Daromad</h3>
+          <span style="font-size:12px;color:#888;background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:8px">7 kun</span>
+        </div>
+        ${chartBar([1200,2100,1800,2800,3250,2600,3800],['Du','Se','Cho','Pa','Ju','Sh','Ya'])}
+      </div>
+      <div class="card" style="padding:20px">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Tezkor Amallar</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn-primary" onclick="goPage('orders')" style="justify-content:center;font-size:13px">📦 Buyurtmalar (${pOrders})</button>
+          <button class="btn-primary" onclick="goPage('deposits')" style="justify-content:center;font-size:13px;background:linear-gradient(135deg,#3498db,#2980b9)">💳 To'lovlar (${pDeps})</button>
+          <button class="btn-ghost" onclick="goPage('shop')" style="justify-content:center">➕ Skin Qo'shish</button>
+          <button class="btn-ghost" onclick="goPage('giveaways')" style="justify-content:center">🎁 Giveaway</button>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div class="card" style="padding:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:14px;font-weight:700">So'nggi Buyurtmalar</span><button class="btn-ghost" style="padding:4px 8px;font-size:11px" onclick="goPage('orders')">Hammasi →</button></div>
+        ${ORDERS.slice(0,4).map(o=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div><div style="font-size:12px;font-weight:600">${o.user}</div><div style="font-size:10px;color:#888">${o.skin_name.substring(0,20)}</div></div>
+          <div style="text-align:right"><div style="font-size:12px;color:#FF6B00;font-weight:700">${num(o.price)}</div>${badge(o.status)}</div>
+        </div>`).join('')}
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:14px;font-weight:700">So'nggi To'lovlar</span><button class="btn-ghost" style="padding:4px 8px;font-size:11px" onclick="goPage('deposits')">Hammasi →</button></div>
+        ${DEPOSITS.slice(0,4).map(d=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div><div style="font-size:12px;font-weight:600">${d.user}</div><div style="font-size:10px;color:#888">${d.method}</div></div>
+          <div style="text-align:right"><div style="font-size:12px;color:#FF6B00;font-weight:700">+${num(d.amount)}</div>${badge(d.status)}</div>
+        </div>`).join('')}
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:14px;font-weight:700">Faol Giveawaylar</span><button class="btn-ghost" style="padding:4px 8px;font-size:11px" onclick="goPage('giveaways')">Hammasi →</button></div>
+        ${GIVEAWAYS.slice(0,3).map(g=>`<div style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div style="font-size:12px;font-weight:600;margin-bottom:3px">${g.title}</div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:#888">
+            <span>👥 ${g.participant_count}/${g.max_participants}</span>${badge(g.status)}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`
+}
+
+// ── SHOP ──────────────────────────────────────────────────────────
+function renderShop() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div><h1 style="font-size:22px;font-weight:800">Shop Management</h1><p style="color:#666;font-size:13px">Skinlarni boshqarish</p></div>
+      <button class="btn-primary" onclick="openAddSkinModal()">➕ Skin Qo'shish</button>
+    </div>
+    <div class="stat-row" style="margin-bottom:16px">
+      ${[{l:'Jami',v:SKINS.length,c:'#FF6B00'},{l:'Faol',v:SKINS.filter(s=>s.status==='active').length,c:'#00d084'},
+         {l:'Yashirin',v:SKINS.filter(s=>s.status==='hidden').length,c:'#888'},{l:'Bugun Sotildi',v:23,c:'#9b59b6'}].map(s=>
+        `<div class="stat-card" style="padding:12px 16px;border-color:${s.c}25;flex:none;width:auto"><div style="font-size:10px;color:#888;margin-bottom:3px">${s.l}</div><div style="font-size:18px;font-weight:800;color:${s.c}">${s.v}</div></div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="tabs">
+        <button class="tab active">Hammasi (${SKINS.length})</button>
+        <button class="tab">Faol</button><button class="tab">Yashirin</button>
+      </div>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>ID</th><th>Nomi</th><th>Turi</th><th>Holat</th><th>Float</th><th>Narx</th><th>Stok</th><th>Status</th><th>Amallar</th></tr></thead>
+        <tbody>${SKINS.map(s=>`<tr>
+          <td style="color:#666;font-weight:600">#${s.id}</td>
+          <td><div style="font-weight:600">${s.name}</div><div style="font-size:10px;color:#666">${s.collection}</div></td>
+          <td style="color:#888;font-size:12px">${s.weapon_type}</td>
+          <td style="color:#3498db;font-size:12px">${s.exterior}</td>
+          <td style="color:#ccc;font-size:12px">${s.float_val}</td>
+          <td style="color:#FF6B00;font-weight:700;white-space:nowrap">${num(s.price)} so'm</td>
+          <td style="color:#ccc">${s.stock} ta</td>
+          <td>${badge(s.status)}</td>
+          <td><div style="display:flex;gap:5px">
+            <button class="btn-sm btn-orange" onclick="editSkin(${s.id})" title="Tahrirlash">✏️</button>
+            <button class="btn-sm btn-red" onclick="deleteSkin(${s.id})" title="O'chirish">🗑️</button>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#666;font-size:13px">Jami ${SKINS.length} ta skin</span>
+        ${pager(SKINS.length)}
+      </div>
+    </div>
+    ${addSkinModal()}`
+}
+function addSkinModal() {
+  return `<div id="add-skin-modal" class="modal-bg" style="display:none">
+    <div class="modal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h3 style="font-size:16px;font-weight:700">Yangi Skin Qo'shish</h3>
+        <button onclick="closeModal('add-skin-modal')" style="background:none;border:none;color:#888;cursor:pointer;font-size:20px">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div><div style="font-size:12px;color:#888;margin-bottom:6px">Nomi</div><input class="inp" placeholder="AK-47 | Redline" id="sk-name"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><div style="font-size:12px;color:#888;margin-bottom:6px">Turi</div>
+            <select class="inp" id="sk-type"><option>Rifle</option><option>Sniper Rifle</option><option>Pistol</option><option>Knife</option></select></div>
+          <div><div style="font-size:12px;color:#888;margin-bottom:6px">Holat</div>
+            <select class="inp" id="sk-ext"><option>Factory New</option><option>Minimal Wear</option><option>Field-Tested</option><option>Well-Worn</option><option>Battle-Scarred</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div><div style="font-size:12px;color:#888;margin-bottom:6px">Float</div><input class="inp" type="number" step="0.01" placeholder="0.16" id="sk-float"/></div>
+          <div><div style="font-size:12px;color:#888;margin-bottom:6px">Pattern</div><input class="inp" type="number" placeholder="782" id="sk-pat"/></div>
+          <div><div style="font-size:12px;color:#888;margin-bottom:6px">Stok</div><input class="inp" type="number" placeholder="1" id="sk-stock"/></div>
+        </div>
+        <div><div style="font-size:12px;color:#888;margin-bottom:6px">Narx (so'm)</div><input class="inp" type="number" placeholder="65000" id="sk-price"/></div>
+        <div><div style="font-size:12px;color:#888;margin-bottom:6px">Kolleksiya</div><input class="inp" placeholder="The Phoenix Collection" id="sk-col"/></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+          <span style="font-size:13px;color:#ccc">Featured qilish</span>
+          <button class="toggle off" id="sk-featured" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn-ghost" style="flex:1;justify-content:center" onclick="closeModal('add-skin-modal')">Bekor</button>
+          <button class="btn-primary" style="flex:2;justify-content:center" onclick="saveSkin()">💾 Saqlash</button>
+        </div>
+      </div>
+    </div>
+  </div>`
+}
+function openAddSkinModal() { document.getElementById('add-skin-modal').style.display='flex' }
+function closeModal(id) { document.getElementById(id).style.display='none' }
+function saveSkin() {
+  const name = document.getElementById('sk-name')?.value
+  if (!name) return toast('Nomi kiritilmagan!','error')
+  toast(`"${name}" skinlar ro'yxatiga qo'shildi!`,'success')
+  closeModal('add-skin-modal')
+}
+function editSkin(id) { toast(`Skin #${id} tahrirlash rejimi`, 'info') }
+function deleteSkin(id) { if(confirm('Skinni o\'chirmoqchimisiz?')) toast(`Skin #${id} o'chirildi`,'success') }
+
+// ── ORDERS ────────────────────────────────────────────────────────
+function renderOrders() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div><h1 style="font-size:22px;font-weight:800">Buyurtmalar</h1><p style="color:#666;font-size:13px">Barcha buyurtmalarni boshqarish</p></div>
+      <button class="btn-ghost">📥 Export</button>
+    </div>
+    <div class="stat-row" style="margin-bottom:16px">
+      ${[{l:'Hammasi',v:ORDERS.length,c:'#3498db'},{l:'Kutilmoqda',v:ORDERS.filter(o=>o.status==='pending').length,c:'#FF6B00'},
+         {l:'Yetkazildi',v:ORDERS.filter(o=>o.status==='delivered').length,c:'#00d084'},{l:'Bekor',v:ORDERS.filter(o=>o.status==='cancelled').length,c:'#e74c3c'}].map(s=>
+        `<div class="stat-card" style="padding:12px 16px;border-color:${s.c}25;flex:1;cursor:pointer" onclick="filterOrders('${s.l}')">
+          <div style="font-size:10px;color:#888;margin-bottom:3px">${s.l}</div>
+          <div style="font-size:20px;font-weight:800;color:${s.c}">${s.v}</div>
+        </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:16px">
+      <div class="card" style="flex:1">
+        <div class="tabs">
+          <button class="tab active">Hammasi (${ORDERS.length})</button>
+          <button class="tab">Kutilmoqda</button><button class="tab">Yetkazildi</button><button class="tab">Bekor</button>
+        </div>
+        <div style="overflow-x:auto"><table class="tbl">
+          <thead><tr><th>ID</th><th>Foydalanuvchi</th><th>Skin</th><th>Narx</th><th>Status</th><th>Sana</th><th>Amallar</th></tr></thead>
+          <tbody id="orders-tbody">${ORDERS.map(o=>`<tr onclick="selectOrder(${o.id})" style="cursor:pointer" id="order-row-${o.id}">
+            <td style="color:#FF6B00;font-weight:700">#${o.id}</td>
+            <td><div style="font-size:12px;font-weight:600">${o.user}</div><div style="font-size:10px;color:#666">${o.first_name}</div></td>
+            <td><div style="font-size:12px;font-weight:600">${o.skin_name}</div><div style="font-size:10px;color:#888">${o.exterior}</div></td>
+            <td style="color:#FF6B00;font-weight:700;white-space:nowrap">${num(o.price)} so'm</td>
+            <td>${badge(o.status)}</td>
+            <td style="color:#888;font-size:11px;white-space:nowrap">${o.created_at}</td>
+            <td><div style="display:flex;gap:4px">
+              <button class="btn-sm btn-blue" onclick="event.stopPropagation();selectOrder(${o.id})">👁</button>
+              ${o.status==='pending'?`<button class="btn-sm btn-green" onclick="event.stopPropagation();confirmOrder(${o.id})">✅</button>
+              <button class="btn-sm btn-red" onclick="event.stopPropagation();cancelOrder(${o.id})">❌</button>`:''}
+            </div></td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+        <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#666;font-size:13px">Jami ${ORDERS.length} ta buyurtma</span>${pager(ORDERS.length)}
+        </div>
+      </div>
+      <div id="order-panel" style="display:none"></div>
+    </div>`
+}
+function selectOrder(id) {
+  const o = ORDERS.find(x=>x.id===id); if(!o) return
+  document.querySelectorAll('.tbl tr').forEach(r=>r.classList.remove('selected'))
+  document.getElementById(`order-row-${id}`)?.classList.add('selected')
+  document.getElementById('order-panel').style.display='block'
+  document.getElementById('order-panel').innerHTML = `<div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div><h3 style="font-size:15px;font-weight:700">Buyurtma #${o.id}</h3>${badge(o.status)}</div>
+      <button onclick="this.closest('#order-panel').style.display='none'" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px">✕</button>
+    </div>
+    <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,107,0,0.2);display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>
+      <div><div style="font-size:13px;font-weight:700">${o.user}</div><div style="font-size:11px;color:#888">${o.first_name} · ID: ${o.telegram_id}</div></div>
+    </div>
+    <div style="background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.2);border-radius:10px;padding:12px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700">${o.skin_name}</div>
+      <div style="font-size:11px;color:#888;margin-top:2px">${o.exterior}</div>
+      <div style="font-size:16px;color:#FF6B00;font-weight:800;margin-top:6px">${num(o.price)} so'm</div>
+    </div>
+    ${[["To'lov",o.payment],["Sana",o.created_at]].map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:12px;color:#888">${k}</span><span style="font-size:12px;font-weight:600">${v}</span></div>`).join('')}
+    ${o.status==='pending'?`<div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+      <button class="btn-primary" style="justify-content:center;background:linear-gradient(135deg,#00d084,#00b872);box-shadow:0 4px 15px rgba(0,208,132,0.3)" onclick="confirmOrder(${o.id})">✅ Tasdiqlash</button>
+      <button class="btn-ghost" style="justify-content:center;color:#e74c3c;border-color:rgba(231,76,60,0.3)" onclick="cancelOrder(${o.id})">❌ Bekor qilish</button>
+    </div>`:''}
+  </div>`
+}
+function confirmOrder(id) { toast(`Buyurtma #${id} tasdiqlandi!`,'success'); document.getElementById(`order-row-${id}`)?.querySelector('td:nth-child(5)')?.replaceWith(Object.assign(document.createElement('td'),{innerHTML:badge('delivered')})) }
+function cancelOrder(id) { toast(`Buyurtma #${id} bekor qilindi`,'error') }
+function filterOrders(f) { toast(`Filter: ${f}`,'info') }
+
+// ── DEPOSITS ──────────────────────────────────────────────────────
+function renderDeposits() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div><h1 style="font-size:22px;font-weight:800">To'lovlar</h1><p style="color:#666;font-size:13px">Depozit so'rovlarini boshqarish</p></div>
+    </div>
+    <div class="stat-row" style="margin-bottom:16px">
+      ${[{l:'Hammasi',v:DEPOSITS.length,c:'#3498db'},{l:'Kutilmoqda',v:DEPOSITS.filter(d=>d.status==='pending').length,c:'#FF6B00'},
+         {l:'Tasdiqlandi',v:DEPOSITS.filter(d=>d.status==='confirmed').length,c:'#00d084'},{l:'Jami Summa',v:'12.45M',c:'#9b59b6'}].map(s=>
+        `<div class="stat-card" style="padding:12px 16px;border-color:${s.c}25;flex:1"><div style="font-size:10px;color:#888;margin-bottom:3px">${s.l}</div><div style="font-size:18px;font-weight:800;color:${s.c}">${s.v}</div></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:16px">
+      <div class="card" style="flex:1">
+        <div class="tabs">
+          <button class="tab active">Hammasi (${DEPOSITS.length})</button>
+          <button class="tab">Kutilmoqda</button><button class="tab">Tasdiqlandi</button><button class="tab">Rad etildi</button>
+        </div>
+        <div style="overflow-x:auto"><table class="tbl">
+          <thead><tr><th>ID</th><th>Foydalanuvchi</th><th>Summa</th><th>Usul</th><th>Tranzaksiya ID</th><th>Status</th><th>Sana</th><th>Amallar</th></tr></thead>
+          <tbody>${DEPOSITS.map(d=>`<tr onclick="selectDeposit(${d.id})" style="cursor:pointer" id="dep-row-${d.id}">
+            <td style="color:#FF6B00;font-weight:700">#${d.id}</td>
+            <td><div style="font-size:12px;font-weight:600">${d.user}</div><div style="font-size:10px;color:#666">${d.first_name}</div></td>
+            <td style="color:#FF6B00;font-weight:700;white-space:nowrap">${num(d.amount)} so'm</td>
+            <td><span style="padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(255,255,255,0.08)">${d.method}</span></td>
+            <td style="color:#888;font-size:11px;font-family:monospace">${d.transaction_id}</td>
+            <td>${badge(d.status)}</td>
+            <td style="color:#888;font-size:11px;white-space:nowrap">${d.created_at}</td>
+            <td><div style="display:flex;gap:4px">
+              ${d.status==='pending'?`<button class="btn-sm btn-green" onclick="event.stopPropagation();approveDep(${d.id})">✅</button>
+              <button class="btn-sm btn-red" onclick="event.stopPropagation();rejectDep(${d.id})">❌</button>`:''}
+            </div></td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+        <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#666;font-size:13px">Jami ${DEPOSITS.length} ta to'lov</span>${pager(DEPOSITS.length)}
+        </div>
+      </div>
+      <div id="dep-panel" style="display:none"></div>
+    </div>`
+}
+function selectDeposit(id) {
+  const d = DEPOSITS.find(x=>x.id===id); if(!d) return
+  document.getElementById('dep-panel').style.display='block'
+  document.getElementById('dep-panel').innerHTML = `<div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div><h3 style="font-size:15px;font-weight:700">To'lov #${d.id}</h3>${badge(d.status)}</div>
+      <button onclick="this.closest('#dep-panel').style.display='none'" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px">✕</button>
+    </div>
+    <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(52,152,219,0.2);display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>
+      <div><div style="font-size:13px;font-weight:700">${d.user}</div><div style="font-size:11px;color:#888">ID: ${d.telegram_id}</div></div>
+    </div>
+    ${[["Summa",`${num(d.amount)} so'm`],["Usul",d.method],["Tranzaksiya",d.transaction_id],["Sana",d.created_at]].map(([k,v])=>
+      `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:12px;color:#888">${k}</span><span style="font-size:12px;font-weight:600;max-width:160px;text-align:right;overflow:hidden;text-overflow:ellipsis">${v}</span></div>`).join('')}
+    ${d.status==='pending'?`<div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+      <button class="btn-primary" style="justify-content:center;background:linear-gradient(135deg,#00d084,#00b872)" onclick="approveDep(${d.id})">✅ Tasdiqlash</button>
+      <button class="btn-ghost" style="justify-content:center;color:#e74c3c;border-color:rgba(231,76,60,0.3)" onclick="rejectDep(${d.id})">❌ Rad etish</button>
+    </div>`:''}
+  </div>`
+}
+function approveDep(id) { toast(`To'lov #${id} tasdiqlandi! Balans to'ldirildi.`,'success') }
+function rejectDep(id) { toast(`To'lov #${id} rad etildi`,'error') }
+
+// ── GIVEAWAYS ─────────────────────────────────────────────────────
+function renderGiveaways() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div><h1 style="font-size:22px;font-weight:800">Giveawaylar</h1></div>
+      <button class="btn-primary" onclick="openGwModal()">🎁 Yangi Giveaway</button>
+    </div>
+    <div class="stat-row" style="margin-bottom:16px">
+      ${[{l:'Hammasi',v:GIVEAWAYS.length,c:'#9b59b6'},{l:'Faol',v:3,c:'#00d084'},{l:"Ishtirokchilar",v:'3,245',c:'#FF6B00'}].map(s=>
+        `<div class="stat-card" style="padding:12px 16px;border-color:${s.c}25;flex:1"><div style="font-size:10px;color:#888;margin-bottom:3px">${s.l}</div><div style="font-size:18px;font-weight:800;color:${s.c}">${s.v}</div></div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="tabs"><button class="tab active">Hammasi</button><button class="tab">Faol</button><button class="tab">Tugagan</button></div>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>ID</th><th>Sarlavha</th><th>Sovg'a</th><th>Ishtirokchi</th><th>Status</th><th>Tugash</th><th>Amallar</th></tr></thead>
+        <tbody>${GIVEAWAYS.map(g=>`<tr>
+          <td style="color:#FF6B00;font-weight:700">#${g.id}</td>
+          <td style="font-weight:600">${g.title}</td>
+          <td style="color:#888;font-size:12px">${g.prize_name}</td>
+          <td>
+            <div style="font-size:12px;font-weight:600">${g.participant_count}/${g.max_participants}</div>
+            <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:3px;margin-top:4px"><div style="width:${Math.round(g.participant_count/g.max_participants*100)}%;height:100%;background:#9b59b6;border-radius:3px"></div></div>
+          </td>
+          <td>${badge(g.status)}</td>
+          <td style="color:#888;font-size:11px">${g.end_time}</td>
+          <td><div style="display:flex;gap:4px">
+            <button class="btn-sm btn-orange" onclick="pickWinner(${g.id})">🎲</button>
+            <button class="btn-sm btn-blue">📊</button>
+            <button class="btn-sm btn-red">🗑️</button>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+    <div id="gw-modal" class="modal-bg" style="display:none"><div class="modal">
+      <div style="display:flex;justify-content:space-between;margin-bottom:18px">
+        <h3 style="font-size:16px;font-weight:700">Yangi Giveaway</h3>
+        <button onclick="closeModal('gw-modal')" style="background:none;border:none;color:#888;cursor:pointer;font-size:20px">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div><div style="font-size:12px;color:#888;margin-bottom:6px">Sarlavha</div><input class="inp" placeholder="Weekly AK-47 Giveaway" id="gw-title"/></div>
+        <div><div style="font-size:12px;color:#888;margin-bottom:6px">Sovg'a nomi</div><input class="inp" placeholder="AK-47 | Redline (FT)" id="gw-prize"/></div>
+        <div><div style="font-size:12px;color:#888;margin-bottom:6px">Tavsif</div><textarea class="inp" rows="3" placeholder="Giveaway haqida..." id="gw-desc" style="resize:vertical"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><div style="font-size:12px;color:#888;margin-bottom:6px">Maks. ishtirokchi</div><input class="inp" type="number" placeholder="200" id="gw-max"/></div>
+          <div><div style="font-size:12px;color:#888;margin-bottom:6px">Min. balans</div><input class="inp" type="number" placeholder="0" id="gw-minbal"/></div>
+        </div>
+        <div><div style="font-size:12px;color:#888;margin-bottom:6px">Tugash vaqti</div><input class="inp" type="datetime-local" id="gw-end"/></div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn-ghost" style="flex:1;justify-content:center" onclick="closeModal('gw-modal')">Bekor</button>
+          <button class="btn-primary" style="flex:2;justify-content:center" onclick="saveGiveaway()">🎁 Yaratish</button>
+        </div>
+      </div>
+    </div></div>`
+}
+function openGwModal() { document.getElementById('gw-modal').style.display='flex' }
+function saveGiveaway() { toast('Giveaway yaratildi!','success'); closeModal('gw-modal') }
+function pickWinner(id) { if(confirm('G\'olibni tasodifiy tanlash?')) toast(`Giveaway #${id} — G'olib tanlandi! Natijalar bot orqali yuborildi.`,'success') }
+
+// ── USERS ─────────────────────────────────────────────────────────
+function renderUsers() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div><h1 style="font-size:22px;font-weight:800">Foydalanuvchilar</h1></div>
+    </div>
+    <div class="stat-row" style="margin-bottom:16px">
+      ${[{l:'Jami',v:328,c:'#9b59b6'},{l:'Faol',v:316,c:'#00d084'},{l:'Bloklangan',v:12,c:'#e74c3c'},{l:'Bugun',v:17,c:'#FF6B00'}].map(s=>
+        `<div class="stat-card" style="padding:12px 16px;border-color:${s.c}25;flex:1"><div style="font-size:10px;color:#888;margin-bottom:3px">${s.l}</div><div style="font-size:18px;font-weight:800;color:${s.c}">${s.v}</div></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:16px">
+      <div class="card" style="flex:1">
+        <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;gap:10px">
+          <input class="inp" placeholder="Username yoki ID qidirish..." style="flex:1"/>
+          <button class="btn-ghost">📥 Export</button>
+        </div>
+        <div style="overflow-x:auto"><table class="tbl">
+          <thead><tr><th>ID</th><th>Foydalanuvchi</th><th>Telegram ID</th><th>Balans</th><th>Buyurtma</th><th>Status</th><th>Qo'shilgan</th><th>Amallar</th></tr></thead>
+          <tbody>${USERS.map(u=>`<tr onclick="selectUser(${u.id})" style="cursor:pointer" id="user-row-${u.id}">
+            <td style="color:#666;font-weight:600">#${u.id}</td>
+            <td><div style="font-size:12px;font-weight:600">${u.username}</div><div style="font-size:10px;color:#888">${u.first_name}</div></td>
+            <td style="color:#888;font-size:12px;font-family:monospace">${u.telegram_id}</td>
+            <td style="color:#FF6B00;font-weight:700;white-space:nowrap">${num(u.balance)} so'm</td>
+            <td style="color:#ccc">${u.orders} ta</td>
+            <td>${badge(u.is_banned?'banned':'active')}</td>
+            <td style="color:#888;font-size:11px;white-space:nowrap">${u.created_at}</td>
+            <td><div style="display:flex;gap:4px">
+              <button class="btn-sm btn-orange" onclick="event.stopPropagation();editUser(${u.id})">✏️</button>
+              <button class="btn-sm btn-red" onclick="event.stopPropagation();banUser(${u.id},${u.is_banned})">${u.is_banned?'🔓':'🔒'}</button>
+            </div></td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+        <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#666;font-size:13px">Jami ${USERS.length} ta foydalanuvchi</span>${pager(USERS.length)}
+        </div>
+      </div>
+      <div id="user-panel" style="display:none"></div>
+    </div>`
+}
+function selectUser(id) {
+  const u = USERS.find(x=>x.id===id); if(!u) return
+  document.getElementById('user-panel').style.display='block'
+  document.getElementById('user-panel').innerHTML = `<div class="panel">
+    <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+      <h3 style="font-size:15px;font-weight:700">Foydalanuvchi #${u.id}</h3>
+      <button onclick="this.closest('#user-panel').style.display='none'" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px">✕</button>
+    </div>
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#FF6B00,#ff3300);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;margin:0 auto 10px">${u.first_name[0]}</div>
+      <div style="font-size:15px;font-weight:700">${u.username}</div>
+      <div style="font-size:12px;color:#888">${u.first_name} · ${u.telegram_id}</div>
+      <div style="font-size:20px;font-weight:900;color:#FF6B00;margin-top:8px">${num(u.balance)} so'm</div>
+    </div>
+    ${[['Buyurtmalar',u.orders+' ta'],['Status',badge(u.is_banned?'banned':'active')],["Qo'shilgan",u.created_at]].map(([k,v])=>
+      `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:12px;color:#888">${k}</span><span style="font-size:12px;font-weight:600">${v}</span></div>`).join('')}
+    <div style="margin-top:14px">
+      <div style="font-size:11px;color:#888;margin-bottom:7px;font-weight:600">Balans amali</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px"><input class="inp" type="number" placeholder="Summa" id="bal-amount" style="flex:1"/></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ghost" style="flex:1;justify-content:center;color:#00d084;border-color:rgba(0,208,132,0.3)" onclick="addBal(${u.id})">+ Qo'shish</button>
+        <button class="btn-ghost" style="flex:1;justify-content:center;color:#e74c3c;border-color:rgba(231,76,60,0.3)" onclick="subBal(${u.id})">− Ayirish</button>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:7px">
+      <button class="btn-ghost" style="justify-content:center;color:var(--orange);border-color:rgba(255,107,0,0.3)" onclick="editUser(${u.id})">✏️ Tahrirlash</button>
+      <button class="btn-ghost" style="justify-content:center;color:#e74c3c;border-color:rgba(231,76,60,0.3)" onclick="banUser(${u.id},${u.is_banned})">${u.is_banned?'🔓 Blokdan chiqarish':'🔒 Bloklash'}</button>
+    </div>
+  </div>`
+}
+function editUser(id) { toast(`Foydalanuvchi #${id} tahrirlash`,'info') }
+function banUser(id, banned) { toast(banned ? `Foydalanuvchi #${id} blokdan chiqarildi`:`Foydalanuvchi #${id} bloklandi`, banned?'success':'error') }
+function addBal(id) { const v=document.getElementById('bal-amount')?.value; if(v) toast(`+${num(parseInt(v))} so'm qo'shildi`,'success') }
+function subBal(id) { const v=document.getElementById('bal-amount')?.value; if(v) toast(`-${num(parseInt(v))} so'm ayirildi`,'info') }
+
+// ── SETTINGS ──────────────────────────────────────────────────────
+function renderSettings() {
+  return `
+    <div style="margin-bottom:22px"><h1 style="font-size:22px;font-weight:800">Sozlamalar</h1></div>
+    <div style="max-width:700px">
+      ${[{title:'Bot Sozlamalari',icon:'🤖',fields:[{l:'Bot Token',t:'password',v:'1234567890:AAG...'},{l:'Admin ID',t:'text',v:'123456789'},{l:'Webapp URL',t:'url',v:'https://your-app.netlify.app'},{l:'Kanal ID',t:'text',v:'@blazecs2'}]},
+         {title:'Sayt Sozlamalari',icon:'⚙️',fields:[{l:'Sayt nomi',t:'text',v:'Blaze CS2 Skin Shop'},{l:"Min. depozit (so'm)",t:'number',v:'10000'},{l:'Referal bonus',t:'number',v:'5000'}]},
+         {title:'Xavfsizlik',icon:'🔒',fields:[{l:'Admin paroli',t:'password',v:''},{l:'Session timeout (min)',t:'number',v:'60'}]}
+        ].map(sec=>`<div class="card" style="padding:20px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,107,0,0.15);border:1px solid rgba(255,107,0,0.3);display:flex;align-items:center;justify-content:center;font-size:17px">${sec.icon}</div>
+          <h3 style="font-size:14px;font-weight:700">${sec.title}</h3>
+        </div>
+        ${sec.fields.map(f=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <label style="font-size:13px;color:#ccc">${f.l}</label>
+          <input type="${f.t}" value="${f.v||''}" class="inp" style="width:220px"/>
+        </div>`).join('')}
+      </div>`).join('')}
+      <div class="card" style="padding:20px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,107,0,0.15);border:1px solid rgba(255,107,0,0.3);display:flex;align-items:center;justify-content:center;font-size:17px">🔔</div>
+          <h3 style="font-size:14px;font-weight:700">Bildirishnomalar</h3>
+        </div>
+        ${['Yangi buyurtmalar','Yangi depozitlar','Yangi foydalanuvchilar','Giveaway tugashi'].map((l,i)=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+            <span style="font-size:13px;color:#ccc">${l}</span>
+            <button class="toggle ${i<2?'on':'off'}" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+          </div>`).join('')}
+      </div>
+      <button class="btn-primary" onclick="toast('Sozlamalar saqlandi!','success')" style="padding:12px 28px;font-size:14px">💾 Saqlash</button>
+    </div>`
+}
+</script>
+</body>
+</html>
