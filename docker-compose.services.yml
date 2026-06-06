@@ -1,0 +1,42 @@
+version: "3.9"
+# docker-compose.services.yml — Add to main compose with:
+# docker compose -f docker-compose.yml -f docker-compose.services.yml up -d
+
+services:
+  # ── Telegram Bot (polling mode — use webhook in production) ────────────────
+  bot:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: blaze_bot
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://blaze:${POSTGRES_PASSWORD}@postgres:5432/blaze
+      REDIS_URL:    redis://:${REDIS_PASSWORD}@redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["python", "bot.py"]
+    networks:
+      - blaze-net
+
+  # ── Background Scheduler ────────────────────────────────────────────────────
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: blaze_scheduler
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://blaze:${POSTGRES_PASSWORD}@postgres:5432/blaze
+      REDIS_URL:    redis://:${REDIS_PASSWORD}@redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["python", "scheduler.py"]
+    networks:
+      - blaze-net

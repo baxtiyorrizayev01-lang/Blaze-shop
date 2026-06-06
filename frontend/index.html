@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#07090f"/>
+<title>Blaze CS2 Market</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root{
+  --bg:       #07090f;
+  --bg2:      #0d1117;
+  --bg3:      #131920;
+  --bg4:      #1a2332;
+  --border:   rgba(255,107,0,.16);
+  --orange:   #ff6b00;
+  --orange2:  #ff8c00;
+  --glow:     rgba(255,107,0,.35);
+  --green:    #00e676;
+  --red:      #ff4444;
+  --blue:     #4fc3f7;
+  --yellow:   #ffd740;
+  --text:     #e8eaed;
+  --muted:    #5f6b7a;
+  --radius:   14px;
+  --safe-top: env(safe-area-inset-top);
+  --safe-bot: env(safe-area-inset-bottom);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%;overflow:hidden}
+body{
+  height:100%;background:var(--bg);color:var(--text);
+  font-family:'Rajdhani',sans-serif;overflow:hidden;
+  display:flex;flex-direction:column;
+  padding-top:var(--safe-top);
+}
+
+/* ── Scrollable area ── */
+#page-wrap{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+#page-wrap::-webkit-scrollbar{display:none}
+
+/* ── Bottom nav ── */
+.bottom-nav{
+  display:flex;background:rgba(13,17,23,.96);
+  border-top:1px solid var(--border);
+  padding:8px 0 calc(8px + var(--safe-bot));
+  flex-shrink:0;backdrop-filter:blur(20px);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 4px;cursor:pointer;transition:all .2s;position:relative;
+}
+.nav-btn .ico{font-size:22px;transition:transform .2s}
+.nav-btn .lbl{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted);transition:color .2s;text-transform:uppercase}
+.nav-btn.active .ico{transform:scale(1.15)}
+.nav-btn.active .lbl{color:var(--orange)}
+.nav-badge{
+  position:absolute;top:2px;right:calc(50% - 18px);
+  background:var(--red);color:#fff;font-size:9px;font-weight:700;
+  border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;
+}
+
+/* ── Pages ── */
+.page{display:none;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── Header ── */
+.page-header{
+  padding:16px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:10;
+  background:rgba(7,9,15,.9);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.page-title{font-size:20px;font-weight:700;letter-spacing:.03em}
+.header-logo{display:flex;align-items:center;gap:8px}
+.header-logo .flame{font-size:26px}
+.header-logo .brand{font-size:22px;font-weight:700;color:var(--orange);letter-spacing:.06em}
+
+/* ── Hero banner ── */
+.hero{
+  margin:14px;border-radius:var(--radius);overflow:hidden;
+  background:linear-gradient(135deg,rgba(255,107,0,.18) 0%,rgba(20,30,50,.9) 60%);
+  border:1px solid rgba(255,107,0,.25);padding:20px;
+  position:relative;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ff6b00' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity:.8;
+}
+.hero-title{font-size:24px;font-weight:700;position:relative;line-height:1.2}
+.hero-title span{color:var(--orange)}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;position:relative}
+.hero-btn{
+  margin-top:16px;padding:11px 22px;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  border:none;border-radius:10px;color:#fff;
+  font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;position:relative;letter-spacing:.04em;
+  box-shadow:0 4px 20px var(--glow);transition:all .2s;
+}
+.hero-btn:active{transform:scale(.96)}
+
+/* ── Section headers ── */
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 16px 10px;
+}
+.section-title{font-size:15px;font-weight:700;letter-spacing:.04em}
+.section-more{font-size:12px;color:var(--orange);cursor:pointer;font-weight:600}
+
+/* ── Featured horizontal scroll ── */
+.featured-scroll{
+  display:flex;gap:12px;padding:0 16px 16px;
+  overflow-x:auto;scroll-snap-type:x mandatory;
+}
+.featured-scroll::-webkit-scrollbar{display:none}
+.featured-card{
+  flex-shrink:0;width:160px;scroll-snap-align:start;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.featured-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,107,0,.08),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.featured-card:active{transform:scale(.96)}
+.featured-card:hover::after,.featured-card:active::after{opacity:1}
+.featured-card img{width:100%;height:90px;object-fit:contain;margin-bottom:8px}
+.featured-card .fc-name{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:4px}
+.featured-card .fc-ext{font-size:10px;color:var(--muted)}
+.featured-card .fc-price{font-size:14px;font-weight:700;color:var(--orange);font-family:'JetBrains Mono',monospace;margin-top:6px}
+.featured-badge{position:absolute;top:8px;right:8px;background:var(--orange);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.04em}
+
+/* ── Skin grid ── */
+.skin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px 12px}
+.skin-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:12px;cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.skin-card:active{transform:scale(.97)}
+.skin-card img{width:100%;height:80px;object-fit:contain;margin-bottom:8px}
+.skin-card .sc-weapon{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.skin-card .sc-name{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:3px}
+.skin-card .sc-ext{font-size:10px;color:var(--muted);margin-bottom:6px}
+.skin-card .sc-price{font-size:15px;font-weight:700;color:var(--orange);font-family:'JetBrains Mono',monospace}
+.skin-card .sc-stock{font-size:10px;color:var(--green);margin-top:3px}
+.skin-card .sc-fav{
+  position:absolute;top:8px;right:8px;font-size:16px;cursor:pointer;
+  transition:transform .2s;z-index:2;
+}
+.skin-card .sc-fav:active{transform:scale(1.3)}
+.rarity-bar{height:2px;border-radius:1px;margin-top:8px}
+
+/* ── Rarity colors ── */
+.rarity-consumer    {background:#adb5bd}
+.rarity-industrial  {background:#5bc0de}
+.rarity-milspec     {background:#4a90d9}
+.rarity-restricted  {background:#8b5cf6}
+.rarity-classified  {background:#d946ef}
+.rarity-covert      {background:#ef4444}
+.rarity-contraband  {background:#f59e0b}
+
+/* ── Filter chips ── */
+.filter-wrap{
+  display:flex;gap:8px;padding:0 16px 12px;
+  overflow-x:auto;scroll-behavior:smooth;
+}
+.filter-wrap::-webkit-scrollbar{display:none}
+.chip{
+  flex-shrink:0;padding:7px 14px;border-radius:20px;
+  border:1px solid var(--border);background:var(--bg2);
+  font-size:12px;font-weight:700;color:var(--muted);
+  cursor:pointer;transition:all .15s;white-space:nowrap;letter-spacing:.03em;
+}
+.chip.active{border-color:var(--orange);color:var(--orange);background:rgba(255,107,0,.1)}
+.chip:active{transform:scale(.94)}
+
+/* ── Search bar ── */
+.search-wrap{padding:12px 16px 8px;position:sticky;top:57px;z-index:9;background:var(--bg)}
+.search-bar{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:10px 14px;
+}
+.search-bar input{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;
+}
+.search-bar input::placeholder{color:var(--muted)}
+
+/* ── Profile card ── */
+.profile-hero{
+  margin:14px;padding:20px;border-radius:var(--radius);
+  background:linear-gradient(135deg,rgba(255,107,0,.12),rgba(13,17,23,.9));
+  border:1px solid rgba(255,107,0,.2);
+  display:flex;align-items:center;gap:16px;
+}
+.profile-avatar{
+  width:64px;height:64px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:700;position:relative;
+}
+.profile-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.steam-badge{
+  position:absolute;bottom:-2px;right:-2px;
+  background:#1b2838;border-radius:50%;width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  border:2px solid var(--bg);
+}
+.profile-name{font-size:20px;font-weight:700}
+.profile-role{
+  display:inline-block;padding:2px 10px;border-radius:10px;
+  font-size:10px;font-weight:700;letter-spacing:.06em;margin-top:3px;
+  background:rgba(255,107,0,.15);color:var(--orange);text-transform:uppercase;
+}
+.balance-section{margin:0 14px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.balance-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;
+}
+.balance-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.balance-value{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--orange)}
+.balance-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ── Menu items ── */
+.menu-list{margin:0 14px;display:flex;flex-direction:column;gap:8px}
+.menu-item{
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px 16px;
+  cursor:pointer;transition:all .15s;
+}
+.menu-item:active{transform:scale(.98)}
+.menu-item:hover{border-color:rgba(255,107,0,.35)}
+.menu-item .mi-icon{font-size:22px;width:30px;text-align:center;flex-shrink:0}
+.menu-item .mi-text{flex:1}
+.menu-item .mi-title{font-size:14px;font-weight:700}
+.menu-item .mi-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.menu-item .mi-arrow{color:var(--muted);font-size:16px}
+.menu-item .mi-badge{
+  background:rgba(255,107,0,.15);color:var(--orange);
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;
+}
+
+/* ── Deposit modal ── */
+.sheet-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;
+  backdrop-filter:blur(4px);display:none;
+}
+.sheet-overlay.open{display:block}
+.bottom-sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:101;
+  background:var(--bg2);border-top:1px solid var(--border);
+  border-radius:20px 20px 0 0;padding:20px 20px calc(20px + var(--safe-bot));
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.3,1);
+  max-height:90vh;overflow-y:auto;
+}
+.bottom-sheet.open{transform:translateY(0)}
+.sheet-handle{width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 20px}
+.sheet-title{font-size:18px;font-weight:700;margin-bottom:20px}
+
+/* ── Payment method cards ── */
+.pay-methods{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.pay-method{
+  border:2px solid var(--border);border-radius:12px;padding:12px 10px;
+  cursor:pointer;transition:all .15s;text-align:center;
+  background:var(--bg3);position:relative;
+}
+.pay-method.selected{border-color:var(--orange);background:rgba(255,107,0,.08)}
+.pay-method:active{transform:scale(.96)}
+.pay-method .pm-icon{font-size:26px;margin-bottom:6px}
+.pay-method .pm-name{font-size:12px;font-weight:700;color:var(--text)}
+.pay-method .pm-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.pm-selected-dot{
+  position:absolute;top:6px;right:6px;width:8px;height:8px;
+  border-radius:50%;background:var(--orange);display:none;
+}
+.pay-method.selected .pm-selected-dot{display:block}
+
+/* ── Amount input ── */
+.amount-input-wrap{margin-bottom:14px}
+.amount-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.amount-input{
+  width:100%;padding:14px 16px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:12px;
+  color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:20px;font-weight:700;outline:none;
+  transition:border .15s;
+}
+.amount-input:focus{border-color:var(--orange)}
+.amount-presets{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.preset{
+  padding:6px 14px;border-radius:20px;border:1px solid var(--border);
+  background:var(--bg3);font-size:12px;font-weight:700;color:var(--muted);
+  cursor:pointer;transition:all .15s;
+}
+.preset:active{border-color:var(--orange);color:var(--orange)}
+
+/* ── Cards info display ── */
+.card-info{
+  background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+  padding:14px;margin-bottom:14px;display:none;
+}
+.card-info.show{display:block}
+.card-info .ci-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.card-info .ci-label{font-size:12px;color:var(--muted)}
+.card-info .ci-value{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;cursor:pointer}
+
+/* ── Primary button ── */
+.btn-primary{
+  width:100%;padding:15px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  color:#fff;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;
+  cursor:pointer;letter-spacing:.04em;transition:all .2s;
+  box-shadow:0 4px 20px var(--glow);
+}
+.btn-primary:active{transform:scale(.97);opacity:.9}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-secondary{
+  width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;letter-spacing:.04em;transition:all .2s;margin-top:8px;
+}
+.btn-secondary:active{transform:scale(.97)}
+
+/* ── Order card ── */
+.order-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;margin:0 14px 10px;
+}
+.order-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.order-skin{font-size:14px;font-weight:700}
+.order-ext{font-size:11px;color:var(--muted);margin-top:2px}
+.order-status{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.status-pending  {background:rgba(255,215,64,.15);color:var(--yellow)}
+.status-confirmed{background:rgba(79,195,247,.15);color:var(--blue)}
+.status-sent     {background:rgba(255,107,0,.15);color:var(--orange)}
+.status-delivered{background:rgba(0,230,118,.15);color:var(--green)}
+.status-cancelled{background:rgba(255,68,68,.15);color:var(--red)}
+.order-meta{display:flex;gap:12px;font-size:12px;color:var(--muted)}
+.order-price{font-size:15px;font-weight:700;color:var(--orange);font-family:'JetBrains Mono',monospace}
+
+/* ── Giveaway card ── */
+.giveaway-card{
+  margin:0 14px 12px;border-radius:var(--radius);overflow:hidden;
+  background:linear-gradient(135deg,rgba(255,107,0,.12),var(--bg2));
+  border:1px solid rgba(255,107,0,.25);padding:16px;
+}
+.gw-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.gw-prize{font-size:13px;color:var(--orange);margin-bottom:10px}
+.gw-meta{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-bottom:12px}
+.gw-progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:12px}
+.gw-progress-bar{height:4px;background:linear-gradient(90deg,var(--orange),var(--orange2));border-radius:2px;transition:width .5s}
+.gw-btn{
+  width:100%;padding:11px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;letter-spacing:.04em;transition:all .2s;
+}
+.gw-btn:active{transform:scale(.97)}
+.gw-btn.joined{background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.3);color:var(--green)}
+.countdown{font-family:'JetBrains Mono',monospace;color:var(--yellow)}
+
+/* ── Referral card ── */
+.ref-card{
+  margin:14px;padding:18px;border-radius:var(--radius);
+  background:var(--bg2);border:1px solid var(--border);
+}
+.ref-link{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+  margin:12px 0;
+}
+.ref-link .rl-text{flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--orange);word-break:break-all}
+.ref-link .rl-copy{background:none;border:none;cursor:pointer;font-size:18px;padding:4px}
+
+/* ── Notification bubble ── */
+.toast-wrap{
+  position:fixed;top:calc(16px + var(--safe-top));left:16px;right:16px;
+  z-index:999;pointer-events:none;
+}
+.toast-msg{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;padding:12px 16px;
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;font-weight:600;
+  animation:toastIn .3s ease,toastOut .3s ease 3.2s forwards;
+  margin-bottom:8px;pointer-events:auto;
+}
+.toast-success{border-left:3px solid var(--green)}
+.toast-error  {border-left:3px solid var(--red)}
+.toast-info   {border-left:3px solid var(--orange)}
+.toast-warn   {border-left:3px solid var(--yellow)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+
+/* ── Daily bonus ── */
+.bonus-card{
+  margin:14px;padding:18px;border-radius:var(--radius);
+  background:linear-gradient(135deg,rgba(255,215,64,.12),rgba(255,107,0,.08));
+  border:1px solid rgba(255,215,64,.25);text-align:center;
+}
+.bonus-icon{font-size:48px;margin-bottom:8px}
+.bonus-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.bonus-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.streak-row{display:flex;justify-content:center;gap:8px;margin-bottom:16px}
+.streak-day{
+  width:32px;height:32px;border-radius:8px;
+  border:1px solid var(--border);background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.streak-day.done{background:rgba(255,215,64,.15);border-color:rgba(255,215,64,.4)}
+
+/* ── Trade URL ── */
+.trade-url-input{
+  width:100%;padding:12px 14px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'Rajdhani',sans-serif;font-size:13px;
+  outline:none;transition:border .15s;margin-bottom:10px;
+}
+.trade-url-input:focus{border-color:var(--orange)}
+
+/* ── Skin detail modal ── */
+.skin-detail-sheet{padding:0 20px 20px}
+.skin-detail-img{width:100%;max-width:240px;height:160px;object-fit:contain;display:block;margin:0 auto 16px}
+.skin-detail-name{font-size:20px;font-weight:700;margin-bottom:4px}
+.skin-detail-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.skin-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.skin-meta-cell{background:var(--bg3);border-radius:10px;padding:10px 12px}
+.skin-meta-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.skin-meta-value{font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.skin-price-big{font-size:32px;font-weight:700;color:var(--orange);font-family:'JetBrains Mono',monospace;margin:12px 0}
+
+/* ── Loading skeleton ── */
+.skeleton{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── Promo code ── */
+.promo-input-row{display:flex;gap:8px;margin-bottom:14px}
+.promo-input{
+  flex:1;padding:12px 14px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;
+  outline:none;text-transform:uppercase;letter-spacing:.04em;
+}
+.promo-input:focus{border-color:var(--orange)}
+.promo-submit{
+  padding:12px 18px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;white-space:nowrap;
+}
+
+/* ── Deposit history ── */
+.deposit-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;margin-bottom:8px;
+}
+.dep-icon{font-size:20px;width:36px;height:36px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dep-info{flex:1}
+.dep-method{font-size:13px;font-weight:700;text-transform:uppercase}
+.dep-date{font-size:11px;color:var(--muted);margin-top:2px}
+.dep-amount{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--green)}
+.dep-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
+
+/* ── Empty state ── */
+.empty{text-align:center;padding:48px 20px}
+.empty .e-ico{font-size:52px;margin-bottom:14px}
+.empty .e-msg{font-size:16px;font-weight:700;margin-bottom:8px}
+.empty .e-sub{font-size:13px;color:var(--muted)}
+
+/* ── Steam section ── */
+.steam-card{
+  margin:14px;padding:18px;border-radius:var(--radius);
+  background:linear-gradient(135deg,rgba(27,40,56,.8),var(--bg2));
+  border:1px solid rgba(27,40,56,.8);
+}
+.steam-connected{display:flex;align-items:center;gap:12px}
+.steam-avatar-img{width:48px;height:48px;border-radius:10px;object-fit:cover}
+.steam-name{font-size:16px;font-weight:700}
+.steam-id{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.inventory-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 14px}
+.inv-item{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:8px;text-align:center;cursor:pointer;transition:all .15s;
+}
+.inv-item:active{transform:scale(.96)}
+.inv-item img{width:100%;height:60px;object-fit:contain;margin-bottom:6px}
+.inv-item-name{font-size:10px;font-weight:700;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.inv-item-ext{font-size:9px;color:var(--muted);margin-top:2px}
+
+/* ── Spinner ── */
+.spinner{width:24px;height:24px;border:2px solid rgba(255,107,0,.3);border-top-color:var(--orange);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-center{display:flex;justify-content:center;padding:40px}
+</style>
+</head>
+<body>
+
+<!-- ── Toast container ── -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ── Main scroll area ── -->
+<div id="page-wrap">
+
+  <!-- ══ HOME PAGE ══════════════════════════════════════════════════════ -->
+  <div class="page active" id="pg-home">
+    <div class="page-header">
+      <div class="header-logo">
+        <div class="flame">🔥</div>
+        <div class="brand">BLAZE</div>
+      </div>
+      <div id="home-balance" style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--orange)">...</div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-title">CS2 Skinlar<br><span>eng arzon narxlarda</span></div>
+      <div class="hero-sub">Xavfsiz to'lov · Tez yetkazish · 10 000+ mijoz</div>
+      <button class="hero-btn" onclick="nav('market')">🔫 Bozorga o'tish</button>
+    </div>
+
+    <div class="section-head">
+      <div class="section-title">⭐ Featured skinlar</div>
+      <div class="section-more" onclick="nav('market')">Barchasi →</div>
+    </div>
+    <div class="featured-scroll" id="featured-scroll">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="section-head">
+      <div class="section-title">🎁 Aktiv giveawaylar</div>
+      <div class="section-more" onclick="nav('giveaways')">Ko'rish →</div>
+    </div>
+    <div id="home-giveaways"></div>
+
+    <div class="section-head">
+      <div class="section-title">📦 So'nggi buyurtmalarim</div>
+      <div class="section-more" onclick="nav('profile')">Barchasi →</div>
+    </div>
+    <div id="home-orders" style="padding:0 14px 14px"></div>
+  </div>
+
+  <!-- ══ MARKET PAGE ════════════════════════════════════════════════════ -->
+  <div class="page" id="pg-market">
+    <div class="page-header">
+      <div class="page-title">🔫 Bozor</div>
+      <button style="background:none;border:none;cursor:pointer;font-size:20px" onclick="openSheet('sort-sheet')">⚙️</button>
+    </div>
+    <div class="search-wrap">
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="search" placeholder="Skin qidirish..." id="search-input" oninput="handleSearch(this.value)"/>
+        <span id="search-clear" style="cursor:pointer;display:none;color:var(--muted)" onclick="clearSearch()">✕</span>
+      </div>
+    </div>
+    <div class="filter-wrap" id="weapon-filters">
+      <div class="chip active" onclick="setWeapon(this,'')">Barchasi</div>
+      <div class="chip" onclick="setWeapon(this,'Rifle')">Rifle</div>
+      <div class="chip" onclick="setWeapon(this,'Pistol')">Pistol</div>
+      <div class="chip" onclick="setWeapon(this,'Sniper Rifle')">Sniper</div>
+      <div class="chip" onclick="setWeapon(this,'Knife')">Pichoq 🔪</div>
+      <div class="chip" onclick="setWeapon(this,'Gloves')">Qo'lqop</div>
+      <div class="chip" onclick="setWeapon(this,'SMG')">SMG</div>
+    </div>
+    <div class="skin-grid" id="skin-grid"></div>
+    <div id="load-more-wrap" style="padding:0 14px 20px;display:none">
+      <button class="btn-secondary" onclick="loadMoreSkins()">Ko'proq yuklash</button>
+    </div>
+  </div>
+
+  <!-- ══ GIVEAWAYS PAGE ════════════════════════════════════════════════ -->
+  <div class="page" id="pg-giveaways">
+    <div class="page-header">
+      <div class="page-title">🎁 Giveawaylar</div>
+    </div>
+    <div id="giveaways-list" style="padding-top:12px"></div>
+  </div>
+
+  <!-- ══ PROFILE PAGE ══════════════════════════════════════════════════ -->
+  <div class="page" id="pg-profile">
+    <div class="page-header">
+      <div class="page-title">👤 Profil</div>
+      <div id="unread-badge" style="display:none">
+        <span class="nav-badge" style="position:static;margin:0">0</span>
+      </div>
+    </div>
+
+    <div class="profile-hero" id="profile-hero">
+      <div class="profile-avatar" id="profile-avatar">?</div>
+      <div>
+        <div class="profile-name" id="profile-name">...</div>
+        <div class="profile-role" id="profile-role">user</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px" id="profile-username">@...</div>
+      </div>
+    </div>
+
+    <div class="balance-section">
+      <div class="balance-card">
+        <div class="balance-label">Balans</div>
+        <div class="balance-value" id="profile-balance">0</div>
+        <div class="balance-sub">so'm</div>
+      </div>
+      <div class="balance-card">
+        <div class="balance-label">Sarflangan</div>
+        <div class="balance-value" style="color:var(--muted)" id="profile-spent">0</div>
+        <div class="balance-sub">so'm jami</div>
+      </div>
+    </div>
+
+    <div class="menu-list">
+      <div class="menu-item" onclick="openSheet('deposit-sheet')">
+        <div class="mi-icon">💳</div>
+        <div class="mi-text">
+          <div class="mi-title">Balans to'ldirish</div>
+          <div class="mi-sub">Payme, Click, Uzum, UzCard/Humo</div>
+        </div>
+        <div class="mi-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="openSheet('orders-sheet')">
+        <div class="mi-icon">📦</div>
+        <div class="mi-text">
+          <div class="mi-title">Buyurtmalarim</div>
+          <div class="mi-sub" id="orders-count-sub">Barcha buyurtmalarim</div>
+        </div>
+        <div class="mi-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="openSheet('daily-sheet')">
+        <div class="mi-icon">🎁</div>
+        <div class="mi-text">
+          <div class="mi-title">Kunlik bonus</div>
+          <div class="mi-sub" id="daily-sub">Har kuni bepul so'm!</div>
+        </div>
+        <div class="mi-badge" id="daily-badge" style="display:none">OLISH</div>
+        <div class="mi-arrow" id="daily-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="openSheet('promo-sheet')">
+        <div class="mi-icon">🎟</div>
+        <div class="mi-text">
+          <div class="mi-title">Promo kod</div>
+          <div class="mi-sub">Bonus so'm kiriting</div>
+        </div>
+        <div class="mi-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="openSheet('ref-sheet')">
+        <div class="mi-icon">👥</div>
+        <div class="mi-text">
+          <div class="mi-title">Do'stlarni taklif qilish</div>
+          <div class="mi-sub" id="ref-count-sub">Har bir referal uchun +5,000 so'm</div>
+        </div>
+        <div class="mi-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="openSheet('steam-sheet')">
+        <div class="mi-icon">🎮</div>
+        <div class="mi-text">
+          <div class="mi-title">Steam akkaunt</div>
+          <div class="mi-sub" id="steam-link-sub">Profilingizni ulang</div>
+        </div>
+        <div class="mi-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="openSheet('tradeurl-sheet')">
+        <div class="mi-icon">🔗</div>
+        <div class="mi-text">
+          <div class="mi-title">Trade URL</div>
+          <div class="mi-sub" id="tradeurl-sub">Skinlarni olish uchun kerak</div>
+        </div>
+        <div class="mi-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="openSheet('notif-sheet')">
+        <div class="mi-icon">🔔</div>
+        <div class="mi-text">
+          <div class="mi-title">Bildirishnomalar</div>
+          <div class="mi-sub" id="notif-sub">0 ta yangi</div>
+        </div>
+        <div class="mi-arrow">›</div>
+      </div>
+    </div>
+    <div style="height:24px"></div>
+  </div>
+
+</div><!-- page-wrap -->
+
+<!-- ── Bottom nav ── -->
+<nav class="bottom-nav">
+  <div class="nav-btn active" id="nav-home" onclick="nav('home')">
+    <div class="ico">🏠</div>
+    <div class="lbl">Bosh</div>
+  </div>
+  <div class="nav-btn" id="nav-market" onclick="nav('market')">
+    <div class="ico">🔫</div>
+    <div class="lbl">Bozor</div>
+  </div>
+  <div class="nav-btn" id="nav-giveaways" onclick="nav('giveaways')">
+    <div class="ico">🎁</div>
+    <div class="lbl">Giveaway</div>
+  </div>
+  <div class="nav-btn" id="nav-profile" onclick="nav('profile')">
+    <div class="ico">👤</div>
+    <div class="lbl">Profil</div>
+    <span class="nav-badge" id="nav-notif-badge" style="display:none">0</span>
+  </div>
+</nav>
+
+<!-- ════════════════════ BOTTOM SHEETS ════════════════════════════════════ -->
+
+<!-- Skin detail -->
+<div class="sheet-overlay" id="overlay-skin" onclick="closeSheet('skin-sheet')"></div>
+<div class="bottom-sheet" id="skin-sheet">
+  <div class="sheet-handle"></div>
+  <div class="skin-detail-sheet" id="skin-detail-content"></div>
+</div>
+
+<!-- Deposit sheet -->
+<div class="sheet-overlay" id="overlay-deposit" onclick="closeSheet('deposit-sheet')"></div>
+<div class="bottom-sheet" id="deposit-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">💳 Balans to'ldirish</div>
+
+  <div class="pay-methods">
+    <div class="pay-method selected" onclick="selectPayMethod(this,'payme')">
+      <div class="pm-selected-dot"></div>
+      <div class="pm-icon">🟢</div>
+      <div class="pm-name">Payme</div>
+      <div class="pm-sub">Online</div>
+    </div>
+    <div class="pay-method" onclick="selectPayMethod(this,'click')">
+      <div class="pm-selected-dot"></div>
+      <div class="pm-icon">🔵</div>
+      <div class="pm-name">Click</div>
+      <div class="pm-sub">Online</div>
+    </div>
+    <div class="pay-method" onclick="selectPayMethod(this,'uzum')">
+      <div class="pm-selected-dot"></div>
+      <div class="pm-icon">🟣</div>
+      <div class="pm-name">Uzum Bank</div>
+      <div class="pm-sub">Online</div>
+    </div>
+    <div class="pay-method" onclick="selectPayMethod(this,'uzcard')">
+      <div class="pm-selected-dot"></div>
+      <div class="pm-icon">💳</div>
+      <div class="pm-name">UzCard/Humo</div>
+      <div class="pm-sub">Qo'lda</div>
+    </div>
+  </div>
+
+  <div class="amount-input-wrap">
+    <div class="amount-label">Summa (so'm)</div>
+    <input class="amount-input" id="deposit-amount" type="number" placeholder="50 000" min="10000"/>
+    <div class="amount-presets">
+      <div class="preset" onclick="setAmount(50000)">50K</div>
+      <div class="preset" onclick="setAmount(100000)">100K</div>
+      <div class="preset" onclick="setAmount(250000)">250K</div>
+      <div class="preset" onclick="setAmount(500000)">500K</div>
+      <div class="preset" onclick="setAmount(1000000)">1M</div>
+    </div>
+  </div>
+
+  <!-- Card info (UzCard/Humo) -->
+  <div class="card-info" id="card-info">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--orange)">💳 Karta ma'lumotlari</div>
+    <div class="ci-row">
+      <div class="ci-label">Karta raqami</div>
+      <div class="ci-value" id="ci-number" onclick="copyText(this.textContent)">8600 0000 0000 0000</div>
+    </div>
+    <div class="ci-row">
+      <div class="ci-label">Egasi</div>
+      <div class="ci-value" id="ci-owner">BLAZE CS2</div>
+    </div>
+    <div class="ci-row" style="margin-bottom:0">
+      <div class="ci-label">Izoh (shart)</div>
+      <div class="ci-value" id="ci-note" style="color:var(--yellow)">Blaze #<span id="ci-order-id">—</span></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:10px">
+      ⚠️ O'tkazgach quyida tranzaksiya ID sini kiriting
+    </div>
+    <input class="amount-input" style="font-size:14px;margin-top:8px" id="manual-txid" placeholder="Tranzaksiya ID (RRNNXXXXXXXX)"/>
+  </div>
+
+  <button class="btn-primary" onclick="submitDeposit()" id="deposit-btn">
+    To'lovni boshlash
+  </button>
+  <div style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px">
+    Minimal: 10,000 so'm · Maksimal: 50,000,000 so'm
+  </div>
+</div>
+
+<!-- Orders sheet -->
+<div class="sheet-overlay" id="overlay-orders" onclick="closeSheet('orders-sheet')"></div>
+<div class="bottom-sheet" id="orders-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">📦 Buyurtmalarim</div>
+  <div id="orders-list"></div>
+</div>
+
+<!-- Daily bonus sheet -->
+<div class="sheet-overlay" id="overlay-daily" onclick="closeSheet('daily-sheet')"></div>
+<div class="bottom-sheet" id="daily-sheet">
+  <div class="sheet-handle"></div>
+  <div class="bonus-card" style="margin:0 0 16px">
+    <div class="bonus-icon">🎁</div>
+    <div class="bonus-title">Kunlik Bonus</div>
+    <div class="bonus-sub" id="daily-desc">Har kuni kirip bepul so'm oling!</div>
+    <div class="streak-row" id="streak-row"></div>
+    <button class="btn-primary" onclick="claimBonus()" id="bonus-btn">🎁 Bonusni olish</button>
+  </div>
+</div>
+
+<!-- Promo sheet -->
+<div class="sheet-overlay" id="overlay-promo" onclick="closeSheet('promo-sheet')"></div>
+<div class="bottom-sheet" id="promo-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">🎟 Promo kod</div>
+  <div class="promo-input-row">
+    <input class="promo-input" id="promo-code-input" placeholder="PROMO KOD" maxlength="32"/>
+    <button class="promo-submit" onclick="submitPromo()">Qo'llash</button>
+  </div>
+  <div style="font-size:13px;color:var(--muted)">
+    Ijtimoiy tarmoqlardagi kontestlar va aktsiyalardan promo kodlarni toping!
+  </div>
+</div>
+
+<!-- Referral sheet -->
+<div class="sheet-overlay" id="overlay-ref" onclick="closeSheet('ref-sheet')"></div>
+<div class="bottom-sheet" id="ref-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">👥 Referal dastur</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:16px">
+    Do'stingizni taklif qilib, har bir ro'yxatdan o'tgan kishi uchun
+    <span style="color:var(--orange);font-weight:700">5,000 so'm</span> oling!
+  </div>
+  <div class="ref-card" style="margin:0 0 14px">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Sizning havolangiz</div>
+    <div class="ref-link">
+      <div class="rl-text" id="ref-link-text">Yuklanmoqda...</div>
+      <button class="rl-copy" onclick="copyRefLink()">📋</button>
+    </div>
+    <div style="display:flex;gap:20px;font-size:13px">
+      <div><span style="color:var(--muted)">Taklif qilinganlar:</span> <span id="ref-count" style="font-weight:700;color:var(--orange)">0</span></div>
+      <div><span style="color:var(--muted)">Daromad:</span> <span id="ref-earned" style="font-weight:700;color:var(--green)">0 so'm</span></div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="shareRefLink()">📤 Ulashish</button>
+</div>
+
+<!-- Steam sheet -->
+<div class="sheet-overlay" id="overlay-steam" onclick="closeSheet('steam-sheet')"></div>
+<div class="bottom-sheet" id="steam-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">🎮 Steam</div>
+  <div id="steam-content"></div>
+</div>
+
+<!-- Trade URL sheet -->
+<div class="sheet-overlay" id="overlay-tradeurl" onclick="closeSheet('tradeurl-sheet')"></div>
+<div class="bottom-sheet" id="tradeurl-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">🔗 Trade URL</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:14px">
+    Skin olish uchun Steam Trade URL ni saqlang.<br/>
+    Steam → Inventar → Trade offerlar → Trade URL
+  </div>
+  <input class="trade-url-input" id="trade-url-input"
+    placeholder="https://steamcommunity.com/tradeoffer/new/?partner=...&token=..."/>
+  <button class="btn-primary" onclick="saveTradeUrl()">💾 Saqlash</button>
+  <button class="btn-secondary" onclick="openSteamTradeHelp()">❓ Qanday topaman?</button>
+</div>
+
+<!-- Notifications sheet -->
+<div class="sheet-overlay" id="overlay-notif" onclick="closeSheet('notif-sheet')"></div>
+<div class="bottom-sheet" id="notif-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">🔔 Bildirishnomalar</div>
+  <div id="notif-list"></div>
+</div>
+
+<!-- Sort/Filter sheet -->
+<div class="sheet-overlay" id="overlay-sort" onclick="closeSheet('sort-sheet')"></div>
+<div class="bottom-sheet" id="sort-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">⚙️ Filtrlash</div>
+  <div class="form-group" style="margin-bottom:14px">
+    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-weight:700">Saralash</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="chip" id="sort-newest" onclick="setSort(this,'newest')">🆕 Yangi</div>
+      <div class="chip active" id="sort-priceAsc" onclick="setSort(this,'price_asc')">💰 Arzon</div>
+      <div class="chip" id="sort-priceDesc" onclick="setSort(this,'price_desc')">💎 Qimmat</div>
+      <div class="chip" id="sort-featured" onclick="setSort(this,'featured')">⭐ Featured</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-weight:700">Narx oralig'i</div>
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <input style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;outline:none" id="price-min" type="number" placeholder="Min"/>
+    <input style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;outline:none" id="price-max" type="number" placeholder="Max"/>
+  </div>
+  <button class="btn-primary" onclick="applyFilters()">✅ Qo'llash</button>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp
+tg?.expand()
+tg?.setHeaderColor?.('#07090f')
+tg?.setBackgroundColor?.('#07090f')
+
+const API = 'https://your-backend.railway.app'  // ← Update this!
+let _token = null, _user = null
+
+/* ── API ── */
+async function api(path, opts={}) {
+  const h = {'Content-Type':'application/json'}
+  if(_token) h['Authorization'] = 'Bearer '+_token
+  if(tg?.initData) h['X-Init-Data'] = tg.initData
+  const r = await fetch(API+path, {...opts, headers:h, body:opts.body?JSON.stringify(opts.body):undefined})
+  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.detail||'Xato') }
+  return r.json()
+}
+const GET  = p     => api(p)
+const POST = (p,b) => api(p,{method:'POST',body:b})
+const PATCH= (p,b) => api(p,{method:'PATCH',body:b})
+const DEL  = p     => api(p,{method:'DELETE'})
+
+/* ── Haptics ── */
+const h = {
+  light:   ()=>tg?.HapticFeedback?.impactOccurred('light'),
+  medium:  ()=>tg?.HapticFeedback?.impactOccurred('medium'),
+  success: ()=>tg?.HapticFeedback?.notificationOccurred('success'),
+  error:   ()=>tg?.HapticFeedback?.notificationOccurred('error'),
+  warn:    ()=>tg?.HapticFeedback?.notificationOccurred('warning'),
+}
+
+/* ── Toast ── */
+function toast(msg, type='info') {
+  h[type==='success'?'success':type==='error'?'error':'light']?.()
+  const w = document.getElementById('toast-wrap')
+  const el = document.createElement('div')
+  el.className = `toast-msg toast-${type}`
+  const icons = {success:'✅',error:'❌',warn:'⚠️',info:'ℹ️'}
+  el.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`
+  w.appendChild(el)
+  setTimeout(()=>el.remove(),3500)
+}
+
+/* ── Navigation ── */
+let curPage = 'home'
+function nav(page) {
+  h.light()
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'))
+  document.getElementById('pg-'+page).classList.add('active')
+  document.getElementById('nav-'+page).classList.add('active')
+  document.getElementById('page-wrap').scrollTop = 0
+  curPage = page
+  const loaders = { market:loadMarket, giveaways:loadGiveaways, profile:loadProfile }
+  loaders[page]?.()
+}
+
+/* ── Sheets ── */
+function openSheet(id) {
+  h.light()
+  const sheet = document.getElementById(id)
+  const name  = id.replace('-sheet','')
+  const ov    = document.getElementById('overlay-'+name)
+  sheet?.classList.add('open')
+  ov?.classList.add('open')
+  // Load content
+  const loaders = {
+    'orders-sheet':   loadOrdersSheet,
+    'daily-sheet':    loadDailySheet,
+    'ref-sheet':      loadRefSheet,
+    'steam-sheet':    loadSteamSheet,
+    'notif-sheet':    loadNotifSheet,
+    'tradeurl-sheet': loadTradeUrlSheet,
+  }
+  loaders[id]?.()
+}
+function closeSheet(id) {
+  document.getElementById(id)?.classList.remove('open')
+  const name = id.replace('-sheet','')
+  document.getElementById('overlay-'+name)?.classList.remove('open')
+}
+
+/* ── Init ── */
+async function init() {
+  // Auth
+  try {
+    if(tg?.initData) {
+      const auth = await POST('/api/auth/telegram', {init_data: tg.initData})
+      _token = auth.access_token
+    }
+    _user = await GET('/api/users/me')
+  } catch(e) {
+    // Dev fallback
+    _user = {id:1,telegram_id:12345,first_name:'Blaze',username:'blazedev',
+              balance:125000,total_spent:65000,role:'user',
+              referral_code:'BLAZE001',steam_id:null,trade_url:null,
+              daily_streak:3,last_daily_bonus:null}
+  }
+
+  updateUI()
+  await Promise.all([loadFeatured(), loadHomeGiveaways(), loadHomeOrders()])
+  checkDailyBonus()
+  loadNotifBadge()
+}
+
+function updateUI() {
+  if(!_user) return
+  const fmt = n => n?.toLocaleString('uz-UZ') || '0'
+
+  // Home balance
+  const hb = document.getElementById('home-balance')
+  if(hb) hb.textContent = fmt(_user.balance)+' so\'m'
+
+  // Profile
+  const avatar = document.getElementById('profile-avatar')
+  if(avatar) avatar.textContent = (_user.first_name||'?')[0].toUpperCase()
+  setEl('profile-name', _user.first_name + (_user.last_name?' '+_user.last_name:''))
+  setEl('profile-username', '@'+(_user.username||'—'))
+  setEl('profile-role', _user.role?.toUpperCase())
+  setEl('profile-balance', fmt(_user.balance))
+  setEl('profile-spent', fmt(_user.total_spent))
+
+  if(_user.trade_url) setEl('tradeurl-sub','Saqlangan ✅')
+  if(_user.steam_id)  setEl('steam-link-sub',_user.steam_username||'Ulangan ✅')
+}
+
+function setEl(id, val) {
+  const el = document.getElementById(id)
+  if(el) el.textContent = val
+}
+
+/* ── Featured skins ── */
+async function loadFeatured() {
+  try {
+    const data = await GET('/api/skins/featured')
+    const wrap = document.getElementById('featured-scroll')
+    if(!data.length) { wrap.innerHTML='<div style="padding:16px;color:var(--muted);font-size:13px">Featured skinlar yo\'q</div>'; return }
+    wrap.innerHTML = data.map(s => `
+      <div class="featured-card" onclick="openSkin(${JSON.stringify(s).replace(/"/g,'&quot;')})">
+        ${s.is_featured?'<div class="featured-badge">⭐ TOP</div>':''}
+        <img src="${s.image_url||''}" alt="${s.name}" onerror="this.style.display='none'"/>
+        <div class="fc-weapon" style="font-size:10px;color:var(--muted);margin-bottom:2px">${s.weapon_type}</div>
+        <div class="fc-name">${s.name}</div>
+        <div class="fc-ext">${s.exterior}</div>
+        <div class="fc-price">${s.price.toLocaleString()}<span style="font-size:10px;margin-left:3px;font-family:'Rajdhani',sans-serif">so'm</span></div>
+      </div>
+    `).join('')
+  } catch(e) { console.warn('Featured load err', e) }
+}
+
+/* ── Market ── */
+let marketOffset = 0, currentWeapon = '', currentSearch = '', currentSort = 'price_asc', minPrice = '', maxPrice = ''
+let searchTimer = null
+
+async function loadMarket(reset=true) {
+  if(reset) { marketOffset = 0; document.getElementById('skin-grid').innerHTML = skeletonGrid(6) }
+  try {
+    const params = new URLSearchParams()
+    params.set('limit','20')
+    params.set('offset', marketOffset)
+    if(currentWeapon)  params.set('weapon_type', currentWeapon)
+    if(currentSearch)  params.set('search', currentSearch)
+    if(currentSort)    params.set('sort', currentSort)
+    if(minPrice)       params.set('min_price', minPrice)
+    if(maxPrice)       params.set('max_price', maxPrice)
+
+    const data = await GET('/api/skins/?'+params)
+    const grid = document.getElementById('skin-grid')
+
+    if(reset) grid.innerHTML = ''
+    if(!data.length && reset) {
+      grid.innerHTML = `<div class="empty" style="grid-column:span 2"><div class="e-ico">🔍</div><div class="e-msg">Skin topilmadi</div><div class="e-sub">Boshqa kalit so'z kiriting</div></div>`
+      document.getElementById('load-more-wrap').style.display = 'none'
+      return
+    }
+
+    grid.innerHTML += data.map(s => `
+      <div class="skin-card" onclick="openSkin(${JSON.stringify(s).replace(/"/g,'&quot;')})">
+        <div class="sc-fav" onclick="event.stopPropagation();toggleFav(${s.id},this)">${s.is_favorite?'❤️':'🤍'}</div>
+        <img src="${s.image_url||''}" alt="${s.name}" onerror="this.style.display='none'"/>
+        <div class="sc-weapon">${s.weapon_type}</div>
+        <div class="sc-name">${s.name}</div>
+        <div class="sc-ext">${s.exterior}</div>
+        <div class="sc-price">${s.price.toLocaleString()}<span style="font-size:10px;margin-left:2px;font-family:'Rajdhani',sans-serif">so'm</span></div>
+        <div class="sc-stock">${s.stock > 5 ? '✅ Mavjud' : s.stock > 0 ? `⚠️ ${s.stock} ta qoldi` : '❌ Tugagan'}</div>
+        <div class="rarity-bar ${rarityClass(s.rarity)}"></div>
+      </div>
+    `).join('')
+
+    marketOffset += data.length
+    document.getElementById('load-more-wrap').style.display = data.length === 20 ? '' : 'none'
+  } catch(e) {
+    document.getElementById('skin-grid').innerHTML = `<div class="empty" style="grid-column:span 2"><div class="e-ico">⚠️</div><div class="e-msg">Yuklashda xato</div></div>`
+  }
+}
+
+function rarityClass(r='') {
+  const map = {'Consumer Grade':'rarity-consumer','Industrial Grade':'rarity-industrial','Mil-Spec Grade':'rarity-milspec','Mil-Spec':'rarity-milspec','Restricted':'rarity-restricted','Classified':'rarity-classified','Covert':'rarity-covert','Contraband':'rarity-contraband'}
+  return map[r] || 'rarity-consumer'
+}
+
+function skeletonGrid(n) {
+  return Array.from({length:n},()=>`<div class="skin-card"><div class="skeleton" style="height:80px;margin-bottom:8px"></div><div class="skeleton" style="height:12px;width:60%;margin-bottom:6px"></div><div class="skeleton" style="height:10px;width:40%"></div></div>`).join('')
+}
+
+function loadMoreSkins() { loadMarket(false) }
+
+function setWeapon(el, type) {
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'))
+  el.classList.add('active')
+  currentWeapon = type
+  loadMarket()
+}
+
+function handleSearch(val) {
+  clearTimeout(searchTimer)
+  currentSearch = val
+  document.getElementById('search-clear').style.display = val ? '' : 'none'
+  searchTimer = setTimeout(()=>loadMarket(),400)
+}
+function clearSearch() {
+  document.getElementById('search-input').value = ''
+  currentSearch = ''
+  document.getElementById('search-clear').style.display = 'none'
+  loadMarket()
+}
+
+function setSort(el, sort) {
+  document.querySelectorAll('#sort-sheet .chip').forEach(c=>c.classList.remove('active'))
+  el.classList.add('active')
+  currentSort = sort
+}
+
+function applyFilters() {
+  minPrice = document.getElementById('price-min').value
+  maxPrice = document.getElementById('price-max').value
+  closeSheet('sort-sheet')
+  loadMarket()
+}
+
+/* ── Skin detail ── */
+let currentSkin = null
+function openSkin(s) {
+  h.light()
+  currentSkin = s
+  const content = document.getElementById('skin-detail-content')
+  content.innerHTML = `
+    <img class="skin-detail-img" src="${s.image_url||''}" alt="${s.name}" onerror="this.style.display='none'"/>
+    <div class="skin-detail-name">${s.name}</div>
+    <div class="skin-detail-sub">${s.weapon_type} · ${s.collection||'—'}</div>
+    <div class="skin-meta-grid">
+      <div class="skin-meta-cell">
+        <div class="skin-meta-label">Holat</div>
+        <div class="skin-meta-value" style="font-size:12px">${s.exterior}</div>
+      </div>
+      <div class="skin-meta-cell">
+        <div class="skin-meta-label">Float</div>
+        <div class="skin-meta-value">${s.float_val?.toFixed(4)||'—'}</div>
+      </div>
+      <div class="skin-meta-cell">
+        <div class="skin-meta-label">Pattern</div>
+        <div class="skin-meta-value">${s.pattern||'—'}</div>
+      </div>
+      <div class="skin-meta-cell">
+        <div class="skin-meta-label">Rarity</div>
+        <div class="skin-meta-value" style="font-size:11px">${s.rarity||'—'}</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="skin-price-big">${s.price.toLocaleString()} <span style="font-size:16px;font-family:'Rajdhani',sans-serif;color:var(--muted)">so'm</span></div>
+      ${s.market_price?`<div style="font-size:12px;color:var(--muted)">Steam: ~${s.market_price.toLocaleString()}</div>`:''}
+    </div>
+    <div style="font-size:13px;margin-bottom:14px;${s.stock>0?'color:var(--green)':'color:var(--red)'}">
+      ${s.stock>5?'✅ Stokda mavjud':s.stock>0?`⚠️ Faqat ${s.stock} ta qoldi`:'❌ Stok tugagan'}
+    </div>
+    ${s.inspect_url?`<button class="btn-secondary" onclick="tg?.openLink('${s.inspect_url}')" style="margin-bottom:8px">🔍 Inspect in-game</button>`:''}
+    <button class="btn-primary" onclick="buySkin()" ${s.stock<1?'disabled':''}>
+      ${s.stock>0?'🛒 Sotib olish':'❌ Stok yo\'q'}
+    </button>
+  `
+  openSheet('skin-sheet')
+}
+
+async function buySkin() {
+  if(!currentSkin) return
+  if(!_user?.trade_url) {
+    toast('Avval Trade URL ni saqlang!', 'warn')
+    closeSheet('skin-sheet')
+    setTimeout(()=>openSheet('tradeurl-sheet'),300)
+    return
+  }
+  if(_user.balance < currentSkin.price) {
+    toast(`Balans yetarli emas! Kerak: ${currentSkin.price.toLocaleString()} so'm`, 'error')
+    closeSheet('skin-sheet')
+    setTimeout(()=>openSheet('deposit-sheet'),300)
+    return
+  }
+  const btn = document.querySelector('#skin-sheet .btn-primary')
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳ Kutilmoqda...' }
+  try {
+    const res = await POST('/api/orders/buy', {skin_id: currentSkin.id})
+    _user.balance -= currentSkin.price
+    updateUI()
+    closeSheet('skin-sheet')
+    toast('✅ Buyurtma qabul qilindi! Admin tasdiqlaydi.','success')
+    loadHomeOrders()
+  } catch(e) {
+    toast(e.message,'error')
+    if(btn){ btn.disabled=false; btn.innerHTML='🛒 Sotib olish' }
+  }
+}
+
+async function toggleFav(skinId, el) {
+  h.light()
+  try {
+    const res = await POST(`/api/skins/${skinId}/favorite`)
+    el.textContent = res.is_favorite ? '❤️' : '🤍'
+    toast(res.is_favorite?'Sevimlilarga qo\'shildi':'Sevimlilardan olib tashlandi','success')
+  } catch(e) { toast(e.message,'error') }
+}
+
+/* ── Giveaways ── */
+let gwJoined = new Set()
+
+async function loadGiveaways() {
+  try {
+    const data = await GET('/api/giveaways/')
+    const list = document.getElementById('giveaways-list')
+    if(!data.length){
+      list.innerHTML=`<div class="empty"><div class="e-ico">🎁</div><div class="e-msg">Hozircha giveaway yo'q</div><div class="e-sub">Tez orada bo'ladi!</div></div>`
+      return
+    }
+    list.innerHTML = data.map(g=>`
+      <div class="giveaway-card">
+        <div class="gw-title">${g.title}</div>
+        <div class="gw-prize">🏆 Sovrin: ${g.prize_name}</div>
+        <div class="gw-meta">
+          <span>👥 ${g.participant_count}/${g.max_participants}</span>
+          <span>⏱ <span class="countdown" id="cd-${g.id}">—</span></span>
+          ${g.min_balance>0?`<span>💰 Min: ${g.min_balance.toLocaleString()}</span>`:''}
+        </div>
+        <div class="gw-progress">
+          <div class="gw-progress-bar" style="width:${Math.min(100,g.participant_count/g.max_participants*100)}%"></div>
+        </div>
+        ${g.require_channel?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px">📢 Kanalga obuna bo'lish shart</div>`:''}
+        <button class="gw-btn ${gwJoined.has(g.id)?'joined':''}" onclick="joinGiveaway(${g.id},this,'${g.title}')">
+          ${gwJoined.has(g.id)?'✅ Qatnashmoqdaman':'🎲 Qatnashish'}
+        </button>
+      </div>
+    `).join('')
+    // Start countdowns
+    data.forEach(g=>startCountdown(g.id, g.end_time))
+  } catch(e) {
+    document.getElementById('giveaways-list').innerHTML=`<div class="empty"><div class="e-ico">⚠️</div><div class="e-msg">Yuklashda xato</div></div>`
+  }
+}
+
+async function loadHomeGiveaways() {
+  try {
+    const data = await GET('/api/giveaways/')
+    const el = document.getElementById('home-giveaways')
+    if(!data.length){ el.innerHTML=''; return }
+    const g = data[0]
+    el.innerHTML = `
+      <div class="giveaway-card" style="margin:0 14px 14px">
+        <div class="gw-title">${g.title}</div>
+        <div class="gw-prize">🏆 ${g.prize_name}</div>
+        <div class="gw-meta"><span>👥 ${g.participant_count}/${g.max_participants}</span></div>
+        <button class="gw-btn" onclick="nav('giveaways')">Ko'rish →</button>
+      </div>
+    `
+  } catch(_){}
+}
+
+async function joinGiveaway(id, btn, title) {
+  h.medium()
+  if(gwJoined.has(id)){ toast('Allaqachon qatnashmoqdasiz!','info'); return }
+  btn.disabled = true
+  try {
+    await POST(`/api/giveaways/${id}/join`)
+    gwJoined.add(id)
+    btn.className='gw-btn joined'
+    btn.textContent='✅ Qatnashmoqdaman'
+    toast(`"${title}" giveaway'ga qo'shildingiz!`,'success')
+    h.success()
+  } catch(e) {
+    toast(e.message,'error')
+    btn.disabled = false
+  }
+}
+
+function startCountdown(id, endTime) {
+  const el = document.getElementById('cd-'+id)
+  if(!el) return
+  function update() {
+    const diff = new Date(endTime) - Date.now()
+    if(diff <= 0){ el.textContent='Tugadi'; return }
+    const d = Math.floor(diff/86400000), hh = Math.floor((diff%86400000)/3600000),
+          mm = Math.floor((diff%3600000)/60000), ss = Math.floor((diff%60000)/1000)
+    el.textContent = d>0?`${d}k ${hh}s`:`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`
+    setTimeout(update, 1000)
+  }
+  update()
+}
+
+/* ── Home orders ── */
+async function loadHomeOrders() {
+  try {
+    const data = await GET('/api/orders/?limit=3')
+    const el = document.getElementById('home-orders')
+    if(!data.length){ el.innerHTML=`<div style="padding:8px;text-align:center;font-size:13px;color:var(--muted)">Buyurtma yo'q</div>`; return }
+    el.innerHTML = data.map(o=>orderCard(o)).join('')
+  } catch(_){}
+}
+
+function orderCard(o) {
+  const icons = {pending:'⏳',confirmed:'✅',sent:'📤',delivered:'🎉',cancelled:'❌'}
+  return `
+    <div class="order-card">
+      <div class="order-header">
+        <div>
+          <div class="order-skin">${o.skin_name}</div>
+          <div class="order-ext">${o.exterior||''}</div>
+        </div>
+        <div class="order-status status-${o.status}">${icons[o.status]||''} ${o.status}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="order-meta">${o.created_at.slice(0,10)}</div>
+        <div class="order-price">${o.price.toLocaleString()} so'm</div>
+      </div>
+      ${o.trade_offer_id?`<div style="font-size:12px;color:var(--blue);margin-top:8px">Trade ID: ${o.trade_offer_id}</div>`:''}
+    </div>
+  `
+}
+
+/* ── Orders sheet ── */
+async function loadOrdersSheet() {
+  const list = document.getElementById('orders-list')
+  list.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>'
+  try {
+    const data = await GET('/api/orders/?limit=30')
+    if(!data.length){
+      list.innerHTML=`<div class="empty"><div class="e-ico">📦</div><div class="e-msg">Buyurtma yo'q</div></div>`
+      return
+    }
+    list.innerHTML = data.map(o=>orderCard(o)).join('')
+    setEl('orders-count-sub', `Jami ${data.length} ta buyurtma`)
+  } catch(e){ list.innerHTML=`<div class="empty"><div class="e-ico">⚠️</div><div class="e-msg">${e.message}</div></div>` }
+}
+
+/* ── Deposits ── */
+let selectedPayMethod = 'payme'
+
+function selectPayMethod(el, method) {
+  h.light()
+  document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('selected'))
+  el.classList.add('selected')
+  selectedPayMethod = method
+  document.getElementById('card-info').classList.toggle('show', method==='uzcard'||method==='humo')
+  const btn = document.getElementById('deposit-btn')
+  btn.textContent = (method==='uzcard'||method==='humo') ? '📤 Tasdiqlash uchun yuborish' : '💳 To\'lovni boshlash'
+}
+
+function setAmount(val) {
+  h.light()
+  document.getElementById('deposit-amount').value = val
+}
+
+async function submitDeposit() {
+  const amount = parseInt(document.getElementById('deposit-amount').value)
+  if(!amount || amount < 10000){ toast('Minimal 10,000 so\'m kiriting','warn'); return }
+  if(amount > 50000000){ toast('Maksimal 50,000,000 so\'m','warn'); return }
+
+  const btn = document.getElementById('deposit-btn')
+  btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:16px;height:16px"></span>'
+
+  try {
+    const res = await POST('/api/deposits/init', {amount, method: selectedPayMethod})
+
+    if(selectedPayMethod==='uzcard'||selectedPayMethod==='humo') {
+      const txid = document.getElementById('manual-txid').value.trim()
+      if(!txid){ toast('Tranzaksiya ID sini kiriting','error'); btn.disabled=false; btn.textContent='📤 Tasdiqlash uchun yuborish'; return }
+      await POST('/api/deposits/manual', {amount, method:selectedPayMethod, transaction_id:txid})
+      closeSheet('deposit-sheet')
+      toast('To\'lov so\'rovi yuborildi! Admin tekshiradi.','success')
+    } else if(res.payment_url) {
+      closeSheet('deposit-sheet')
+      tg?.openLink(res.payment_url)
+      toast('To\'lov sahifasiga yo\'naltirilmoqda...','info')
+    } else {
+      toast(res.error||'Xato yuz berdi','error')
+    }
+  } catch(e){ toast(e.message,'error') }
+  finally { btn.disabled=false; btn.textContent='💳 To\'lovni boshlash' }
+}
+
+/* ── Daily bonus ── */
+function checkDailyBonus() {
+  if(!_user) return
+  const last = _user.last_daily_bonus
+  const canClaim = !last || (Date.now() - new Date(last).getTime() >= 86400000)
+  if(canClaim) {
+    const badge = document.getElementById('daily-badge')
+    const arrow = document.getElementById('daily-arrow')
+    if(badge){ badge.style.display=''; arrow.style.display='none' }
+  }
+}
+
+function loadDailySheet() {
+  const streak = _user?.daily_streak||0
+  setEl('daily-desc', `Ketma-ket ${streak} kun! Bonus: ${(2000+Math.min(streak*500,5000)).toLocaleString()} so'm`)
+  const row = document.getElementById('streak-row')
+  row.innerHTML = Array.from({length:7},(_,i)=>`
+    <div class="streak-day ${i<streak?'done':''}">${i<streak?'🔥':'⬜'}</div>
+  `).join('')
+}
+
+async function claimBonus() {
+  const btn = document.getElementById('bonus-btn')
+  btn.disabled=true; btn.textContent='⏳...'
+  try {
+    const res = await POST('/api/users/daily-bonus')
+    _user.balance += res.amount
+    _user.daily_streak = res.streak
+    updateUI()
+    closeSheet('daily-sheet')
+    toast(`🎁 +${res.amount.toLocaleString()} so'm! ${res.streak} kun ketma-ket!`,'success')
+    h.success()
+    document.getElementById('daily-badge').style.display='none'
+    document.getElementById('daily-arrow').style.display=''
+  } catch(e){
+    toast(e.message,'warn')
+    btn.disabled=false; btn.textContent='🎁 Bonusni olish'
+  }
+}
+
+/* ── Promo ── */
+async function submitPromo() {
+  const code = document.getElementById('promo-code-input').value.trim().toUpperCase()
+  if(!code){ toast('Kod kiriting','warn'); return }
+  try {
+    const res = await POST(`/api/users/promo?code=${encodeURIComponent(code)}`)
+    _user.balance += res.amount
+    updateUI()
+    closeSheet('promo-sheet')
+    toast(`🎟 +${res.amount.toLocaleString()} so'm!`,'success')
+    h.success()
+    document.getElementById('promo-code-input').value=''
+  } catch(e){ toast(e.message,'error') }
+}
+
+/* ── Referrals ── */
+async function loadRefSheet() {
+  try {
+    const data = await GET('/api/users/referrals')
+    setEl('ref-link-text', data.link)
+    setEl('ref-count', data.count)
+    setEl('ref-earned', data.earned.toLocaleString()+' so\'m')
+    setEl('ref-count-sub', `${data.count} ta referal · ${data.earned.toLocaleString()} so'm`)
+  } catch(e){}
+}
+
+function copyRefLink() {
+  const text = document.getElementById('ref-link-text').textContent
+  navigator.clipboard?.writeText(text)
+  toast('Havola nusxalandi!','success')
+  h.success()
+}
+
+function shareRefLink() {
+  const text = document.getElementById('ref-link-text').textContent
+  tg?.switchInlineQuery?.(text) || navigator.share?.({url: text})
+}
+
+/* ── Steam ── */
+async function loadSteamSheet() {
+  const content = document.getElementById('steam-content')
+  if(_user?.steam_id) {
+    content.innerHTML = `
+      <div class="steam-connected" style="margin-bottom:16px">
+        <div class="steam-avatar-img" style="background:var(--bg3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;width:48px;height:48px">🎮</div>
+        <div>
+          <div class="steam-name">${_user.steam_username||'Steam foydalanuvchi'}</div>
+          <div class="steam-id">${_user.steam_id}</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="loadInventory()" style="margin-bottom:8px">📦 Inventarni ko'rish</button>
+      <button class="btn-secondary" onclick="unlinkSteam()">🔓 Uzish</button>
+      <div id="inventory-content"></div>
+    `
+  } else {
+    content.innerHTML = `
+      <div style="text-align:center;padding:20px 0 24px">
+        <div style="font-size:52px;margin-bottom:14px">🎮</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px">Steam'ni ulang</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Inventaringizni ko'ring va<br/>trade URL ni avtomatik aniqlang</div>
+      </div>
+      <button class="btn-primary" onclick="linkSteam()">🔗 Steam bilan kirish</button>
+    `
+  }
+}
+
+async function linkSteam() {
+  try {
+    const res = await GET('/api/auth/steam/login')
+    if(res.redirect_url) tg?.openLink(res.redirect_url)
+  } catch(e){ toast(e.message,'error') }
+}
+
+async function unlinkSteam() {
+  try {
+    await DEL('/api/auth/steam/unlink')
+    _user.steam_id=null; _user.steam_username=null
+    updateUI()
+    loadSteamSheet()
+    toast('Steam uzildi','info')
+  } catch(e){ toast(e.message,'error') }
+}
+
+async function loadInventory() {
+  const inv = document.getElementById('inventory-content')
+  if(!inv) return
+  inv.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>'
+  try {
+    const data = await GET('/api/steam/inventory')
+    if(data.error){ inv.innerHTML=`<div style="text-align:center;padding:20px;color:var(--red)">${data.error==='inventory_private'?'Inventar yopiq':data.error}</div>`; return }
+    if(!data.items?.length){ inv.innerHTML='<div class="empty"><div class="e-ico">📦</div><div class="e-msg">CS2 inventar bo\'sh</div></div>'; return }
+    inv.innerHTML = `
+      <div style="font-size:13px;color:var(--muted);margin:14px 0 10px">
+        Jami: ${data.total} ta predmet (tradable)
+      </div>
+      <div class="inventory-grid">
+        ${data.items.slice(0,30).map(i=>`
+          <div class="inv-item">
+            <img src="${i.icon_url}" alt="${i.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22/>'"/>
+            <div class="inv-item-name">${i.name}</div>
+            <div class="inv-item-ext">${i.exterior||'—'}</div>
+          </div>
+        `).join('')}
+      </div>
+    `
+  } catch(e){ inv.innerHTML=`<div class="empty"><div class="e-ico">⚠️</div><div class="e-msg">${e.message}</div></div>` }
+}
+
+/* ── Trade URL ── */
+function loadTradeUrlSheet() {
+  const inp = document.getElementById('trade-url-input')
+  if(inp && _user?.trade_url) inp.value = _user.trade_url
+}
+
+async function saveTradeUrl() {
+  const url = document.getElementById('trade-url-input').value.trim()
+  if(!url){ toast('URL kiriting','warn'); return }
+  if(!url.includes('steamcommunity.com/tradeoffer')){ toast('Noto\'g\'ri Trade URL format','error'); return }
+  try {
+    await PATCH('/api/users/me', {trade_url: url})
+    _user.trade_url = url
+    updateUI()
+    closeSheet('tradeurl-sheet')
+    toast('Trade URL saqlandi! ✅','success')
+    h.success()
+  } catch(e){ toast(e.message,'error') }
+}
+
+function openSteamTradeHelp() {
+  tg?.openLink('https://steamcommunity.com/my/tradeoffers/privacy#trade_offer_access_url')
+}
+
+/* ── Notifications ── */
+async function loadNotifBadge() {
+  try {
+    const res = await GET('/api/users/notifications/unread-count')
+    const cnt = res.count
+    const badge = document.getElementById('nav-notif-badge')
+    const ub = document.getElementById('unread-badge')
+    if(cnt>0){
+      badge.textContent = cnt; badge.style.display=''
+      ub.style.display=''
+      ub.querySelector('.nav-badge').textContent = cnt
+      setEl('notif-sub', `${cnt} ta yangi xabar`)
+    } else {
+      badge.style.display='none'; ub.style.display='none'
+    }
+  } catch(_){}
+}
+
+async function loadNotifSheet() {
+  const list = document.getElementById('notif-list')
+  list.innerHTML='<div class="loading-center"><div class="spinner"></div></div>'
+  try {
+    const data = await GET('/api/users/notifications?limit=30')
+    if(!data.length){ list.innerHTML='<div class="empty"><div class="e-ico">🔔</div><div class="e-msg">Bildirishnomalar yo\'q</div></div>'; return }
+    const icons = {success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'}
+    list.innerHTML = data.map(n=>`
+      <div style="padding:12px;background:${n.is_read?'var(--bg3)':'var(--bg2)'};border:1px solid var(--border);border-radius:10px;margin-bottom:8px;${!n.is_read?'border-left:3px solid var(--orange)':''}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span>${icons[n.type]||'ℹ️'}</span>
+          <div style="font-size:14px;font-weight:700;flex:1">${n.title}</div>
+          <div style="font-size:11px;color:var(--muted)">${n.created_at.slice(0,16).replace('T',' ')}</div>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">${n.message}</div>
+      </div>
+    `).join('')
+    // Refresh badge
+    document.getElementById('nav-notif-badge').style.display='none'
+    document.getElementById('unread-badge').style.display='none'
+    setEl('notif-sub','0 ta yangi')
+  } catch(e){ list.innerHTML=`<div class="empty"><div class="e-ico">⚠️</div><div class="e-msg">${e.message}</div></div>` }
+}
+
+/* ── Profile ── */
+async function loadProfile() {
+  try {
+    _user = await GET('/api/users/me')
+    updateUI()
+    loadNotifBadge()
+  } catch(_){}
+}
+
+/* ── Copy ── */
+function copyText(text) {
+  navigator.clipboard?.writeText(text)
+  toast('Nusxalandi!','success')
+  h.light()
+}
+
+/* ── Back button ── */
+tg?.BackButton?.onClick(() => {
+  // Close any open sheet first
+  const openSheet = document.querySelector('.bottom-sheet.open')
+  if(openSheet){ openSheet.classList.remove('open'); document.querySelectorAll('.sheet-overlay').forEach(o=>o.classList.remove('open')); return }
+  if(curPage !== 'home') nav('home')
+  else tg?.close()
+})
+
+/* ── Init ── */
+init()
+</script>
+</body>
+</html>
